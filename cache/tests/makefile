@@ -3,14 +3,17 @@ CXX:= g++
 
 .PHONY: all clean
 
-all: lru 2q
+all: lru 2q 2q_int
 
 -include *.d
 
-lru: lru.o common.o
+lru: lru.o
 	$(CXX) $(CFLAGS) -o $@ $^
 
-2q: 2q.o common.o
+2q: 2q.o
+	$(CXX) $(CFLAGS) -o $@ $^
+
+2q_int: 2q_int.o
 	$(CXX) $(CFLAGS) -o $@ $^
 
 %.o: %.cpp
@@ -19,6 +22,7 @@ lru: lru.o common.o
 test: all
 	./lru
 	./2q
+	./2q_int
 
 clean:
-	rm -rf lru 2q *.o *.d
+	rm -rf lru 2q 2q_int *.o *.d

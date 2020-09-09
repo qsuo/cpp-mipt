@@ -1,35 +1,13 @@
 
 #include <iostream>
-#include <cassert>
-#include <cstddef>
-#include <string>
-#include <sstream>
 #include <vector>
 
-#include <stdio.h>
-
 #include "common.h"
-#include "../cache.h"
-#include "../page.h"
+#include "../lru_cache.h"
+#include "page.h"
 
 const size_t CACHE_SIZE = 2;
 
-/*
-std::vector<Page> input(const std::string accesses)
-{
-    std::stringstream stream(accesses);
-    std::vector<Page> pages;
-    while(1)
-    {
-        Page::Id n;
-        stream >> n;
-        if(!stream)
-            break;
-        pages.push_back({n, 0, NULL});
-    }
-    return pages;
-}
-*/
 
 int main()
 {
@@ -37,51 +15,52 @@ int main()
     for(size_t i = 0; i < CACHE_SIZE + 1; i++)
         pages.push_back({(Page::Id)i, 0, NULL});
 
-    LRU<Page> lru(CACHE_SIZE);
+    LRU<Page, Page::Id> lru(CACHE_SIZE);
 
     TEST(lru.full() == false);
-    TEST(lru.hit(pages[0]) == false);
-    TEST(lru.hit(pages[1]) == false);
+    TEST(lru.hit(pages[0].id) == false);
+    TEST(lru.hit(pages[1].id) == false);
     
-    auto tmp = lru.insert(pages[0]);
+    auto tmp = lru.insert(pages[0], pages[0].id);
     TEST(tmp.id == pages[0].id);
-    TEST(lru.hit(pages[0]) == true);
-    TEST(lru.hit(pages[1]) == false);
+    TEST(lru.hit(pages[0].id) == true);
+    TEST(lru.hit(pages[1].id) == false);
     TEST(lru.full() == false);
 
-    tmp = lru.insert(pages[1]);
+    tmp = lru.insert(pages[1], pages[1].id);
     TEST(tmp.id == pages[1].id);
-    TEST(lru.hit(pages[0]) == true);
-    TEST(lru.hit(pages[1]) == true);
+    TEST(lru.hit(pages[0].id) == true);
+    TEST(lru.hit(pages[1].id) == true);
     TEST(lru.full() == true);
 
-    tmp = lru.insert(pages[0]);
+    tmp = lru.insert(pages[0], pages[0].id);
     TEST(tmp.id == pages[0].id);
-    TEST(lru.hit(pages[0]) == true);
+    TEST(lru.hit(pages[0].id) == true);
 
-    tmp = lru.insert(pages[2]);
+    tmp = lru.insert(pages[2], pages[2].id);
     TEST(tmp.id == pages[1].id);
-    TEST(lru.hit(pages[0]) == true);
-    TEST(lru.hit(pages[1]) == false);
-    TEST(lru.hit(pages[2]) == true);
+    TEST(lru.hit(pages[0].id) == true);
+    TEST(lru.hit(pages[1].id) == false);
+    TEST(lru.hit(pages[2].id) == true);
     TEST(lru.full() == true);
     
-    tmp = lru.insert(pages[2]);
+    tmp = lru.insert(pages[2], pages[2].id);
     TEST(tmp.id == pages[2].id);
-    TEST(lru.hit(pages[0]) == true);
-    TEST(lru.hit(pages[2]) == true);
+    TEST(lru.hit(pages[0].id) == true);
+    TEST(lru.hit(pages[2].id) == true);
     TEST(lru.full() == true);
 
-    lru.pull(pages[2]);
-    TEST(lru.hit(pages[2]) == false);
+    TEST(lru.pull(pages[2].id) == true);
+    TEST(lru.hit(pages[2].id) == false);
+    TEST(lru.pull(pages[2].id) == false);
 
-    LRU<Page> lru2(CACHE_SIZE + 1);
+    LRU<Page, Page::Id> lru2(CACHE_SIZE + 1);
     for(auto page : pages)
-        lru2.insert(page);
+        lru2.insert(page, page.id);
     TEST(lru2.full() == true);
-    lru2.pull(pages[1]);
-    TEST(lru2.hit(pages[1]) == false);
-
+    lru2.pull(pages[1].id);
+    TEST(lru2.hit(pages[1].id) == false);
+    
     return 0;
 }
 

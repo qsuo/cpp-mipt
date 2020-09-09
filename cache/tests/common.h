@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include "../page.h"
+#include "page.h"
 
 #define TEST(expr) do\
 {\
@@ -14,8 +14,6 @@
         exit(1); \
     }\
 } while(0)
-
-std::vector<Page> generatePages(unsigned n);
 
 
 #endif
