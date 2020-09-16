@@ -15,7 +15,7 @@ TEST_OBJS:= $(patsubst %.cpp,%.o,$(TEST_SOURCES))
 SOURCES:= $(wildcard *.cpp)
 OBJS:= $(patsubst %.cpp,%.o,$(SOURCES))
 
-EXE:= test main
+EXE:= cache_test main
 
 .PHONY: all clean
 
@@ -38,7 +38,7 @@ main: $(OBJS)
 $(TEST_OBJS): $(TEST_SOURCES)
 	$(CXX) $(CXXFLAGS) $(TEST_FLAGS) -o $@ -c $< $(LIB_FLAGS)
 
-test: $(TEST_OBJS) 
+cache_test: $(TEST_OBJS) 
 	$(CXX) $(CXXFLAGS) $(TEST_FLAGS) -o $@ $^	$(LIB_FLAGS)
 
 clean:
