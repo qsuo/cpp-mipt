@@ -5,6 +5,19 @@
 
 const size_t CACHE_SIZE = 100;
 
+TEST(Cache2Q, init)
+{
+    Cache2Q<int, int> cache1(0), cache2(3);
+    ASSERT_EQ(cache1.sizeMain(), static_cast<size_t>(1));
+    ASSERT_EQ(cache1.sizeIn(), static_cast<size_t>(1));
+    ASSERT_EQ(cache1.sizeOut(), static_cast<size_t>(1));
+
+    ASSERT_EQ(cache2.sizeMain(), static_cast<size_t>(1));
+    ASSERT_EQ(cache2.sizeIn(), static_cast<size_t>(1));
+    ASSERT_EQ(cache2.sizeOut(), static_cast<size_t>(1));
+    ASSERT_EQ(cache2.size(), static_cast<size_t>(2));
+}
+
 TEST(Cache2Q, minimalFunctional)
 {
     const size_t MAIN_SIZE = 3;

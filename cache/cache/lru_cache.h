@@ -2,6 +2,7 @@
 #ifndef LRU_CACHE_H
 #define LRU_CACHE_H
 
+#include <iostream>
 #include <unordered_map>
 #include <list>
 
@@ -9,11 +10,15 @@ template <typename T, typename KeyT>
 class LRU
 {
 public:
-    explicit LRU(size_t size): size_(size) {}
+    explicit LRU(size_t size): size_(size > 0 ? size : 1) {}
 
     bool full() const;
     bool hit(const KeyT &key) const;
     void dump() const;
+    size_t size() const
+    {
+        return size_;
+    }
 
     T insert(const T &data, const KeyT &key);
     bool pull(const KeyT &key);
@@ -36,7 +41,6 @@ private:
     std::unordered_map<KeyT, listIt> hash_;
 
 };
-
 
 template <typename T, typename KeyT>
 void LRU<T, KeyT>::dump() const

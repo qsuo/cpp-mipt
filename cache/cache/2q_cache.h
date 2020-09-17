@@ -14,12 +14,35 @@ public:
     explicit Cache2Q(size_t size);
     Cache2Q(size_t mainSize, size_t inSize, size_t outSize);
  
+    size_t sizeMain() const
+    {
+        return main_.size();
+    }
+
+    size_t sizeIn() const
+    {
+        return in_.size();
+    }
+
+    size_t sizeOut() const
+    {
+        return out_.size();
+    }
+
+    size_t size() const
+    {
+        return main_.size() + in_.size();
+    }
+
     bool full() const;
     bool hit(const KeyT &key) const;
-    void dump();
+    void dump() const;
+
     bool lookup(const T &data, const KeyT &key);
 
 private:
+
+    static const size_t divider_ = 4;
 
     struct Item
     {
@@ -38,10 +61,10 @@ private:
 
 template <typename T, typename KeyT>
 Cache2Q<T, KeyT>::Cache2Q(size_t size):
-    size_(size),
-    main_(size - size / 4),
-    in_(size / 4),
-    out_(size - size / 4) {}
+    size_((size > divider_) ? size : 2),
+    main_((size > divider_) ? (size - size / 4) : 1),
+    in_((size > divider_) ? (size / 4) : 1),
+    out_((size > divider_) ? (size - size / 4) : 1) {}
 
 template <typename T, typename KeyT>
 Cache2Q<T, KeyT>::Cache2Q(size_t mainSize, size_t inSize, size_t outSize):
@@ -51,7 +74,7 @@ Cache2Q<T, KeyT>::Cache2Q(size_t mainSize, size_t inSize, size_t outSize):
     out_(outSize) {}
 
 template <typename T, typename KeyT>
-void Cache2Q<T, KeyT>::dump()
+void Cache2Q<T, KeyT>::dump() const
 {
     std::cout << "*************" << std::endl;
     std::cout << "MAIN:" << std::endl;

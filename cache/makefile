@@ -14,9 +14,9 @@ TEST_OBJS:= $(TEST_SOURCES:.cpp=.o)
 SOURCES:= $(wildcard *.cpp)
 OBJS:= $(SOURCES:.cpp=.o)
 
-EXE:= test main
+EXE:= test main compare
 
-.PHONY: all clean
+.PHONY: clean
 
 all: gtestlib $(EXE) 
 
@@ -36,9 +36,12 @@ $(TEST_DIR)/%.o: $(TEST_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 test: $(TEST_OBJS) 
-	$(CXX) $(CXXFLAGS) $(TEST_FLAGS) -o $@ $^	$(LIB_FLAGS)
+	$(CXX) $(CXXFLAGS) $(TEST_FLAGS) -o $@ $^ $(LIB_FLAGS)
 
-main: $(OBJS)
+main: main.o
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+compare: compare.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
