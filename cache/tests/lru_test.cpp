@@ -5,6 +5,13 @@
 
 const size_t CACHE_SIZE = 100;
 
+TEST(CacheLRU, init)
+{
+    LRU<size_t, size_t> lru(0);    
+    ASSERT_EQ(lru.size(), static_cast<size_t>(1));
+}
+
+
 TEST(CacheLRU, minimalFunctional)
 {
     const size_t CACHE_SIZE = 2;
@@ -109,4 +116,5 @@ TEST(CacheLRU, hits)
     }
     ASSERT_EQ(hits, static_cast<size_t>(CACHE_SIZE));
 }
+
 
