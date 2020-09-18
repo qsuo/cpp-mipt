@@ -61,10 +61,10 @@ private:
 
 template <typename T, typename KeyT>
 Cache2Q<T, KeyT>::Cache2Q(size_t size):
-    size_((size > divider_) ? size : 2),
-    main_((size > divider_) ? (size - size / 4) : 1),
-    in_((size > divider_) ? (size / 4) : 1),
-    out_((size > divider_) ? (size - size / 4) : 1) {}
+    size_((size >= divider_) ? size : 2),
+    main_((size >= divider_) ? (size - size / 4) : 1),
+    in_((size >= divider_) ? (size / 4) : 1),
+    out_((size >= divider_) ? (size - size / 4) : 1) {}
 
 template <typename T, typename KeyT>
 Cache2Q<T, KeyT>::Cache2Q(size_t mainSize, size_t inSize, size_t outSize):
