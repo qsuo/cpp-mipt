@@ -4,6 +4,7 @@
 
 #include <list>
 #include <unordered_map>
+#include <cassert>
 
 #include "lru_cache.h"
 
@@ -90,6 +91,12 @@ void Cache2Q<T, KeyT>::dump() const
 }
 
 template <typename T, typename KeyT>
+bool Cache2Q<T, KeyT>::full() const
+{
+    return (main_.full() && in_.full());
+}
+
+template <typename T, typename KeyT>
 bool Cache2Q<T, KeyT>::hit(const KeyT &key) const
 {
     auto mainHit = main_.hit(key);
@@ -106,47 +113,41 @@ bool Cache2Q<T, KeyT>::lookup(const T &data, const KeyT &key)
 
     auto mainHit = main_.hit(key);
     auto inHit = in_.hit(key);
-
-    if(!mainHit)
-    {
-        auto outHit = out_.hit(item.key);
-        if(outHit)
-        {
-            main_.insert(item, item.key);
-            out_.pull(item.key);
-            return false;
-        }
-
-        if(!inHit)
-        {
-            if(in_.full())
-            {
-                auto poped = in_.insert(item, item.key);
-                out_.insert(poped.key, poped.key);
-            }
-            else
-                in_.insert(item, item.key);
-            
-            return false;
-        }
-        else
-        {
-            in_.insert(item, item.key);
-            return true;
-        }
-
-    }
-    else
+    auto outHit = out_.hit(item.key);
+    
+    if(mainHit)
     {
         main_.insert(item, item.key);
         return true;
     }
+    
+    else if(!mainHit && inHit)
+    {
+        in_.insert(item, item.key);
+        return true;
+    }
+
+    else if(!mainHit && outHit)
+    {
+        main_.insert(item, item.key);
+        out_.pull(item.key);
+        return false;
+    }
+
+    else // if(!mainHit && !inHit)
+    {
+        if(in_.full())
+        {
+            auto poped = in_.insert(item, item.key);
+            out_.insert(poped.key, poped.key);
+        }
+        else
+            in_.insert(item, item.key);
+        
+        return false;
+    }
+
 }
 
-template <typename T, typename KeyT>
-bool Cache2Q<T, KeyT>::full() const
-{
-    return (main_.full() && in_.full());
-}
 
 #endif
