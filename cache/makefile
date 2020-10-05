@@ -1,7 +1,7 @@
 CXX:= g++
 CXXFLAGS:= -Wall -MD 
 TEST_DIR:= ./tests
-GTEST_DIR:= $(TEST_DIR)/gtest
+GTEST_DIR:= ..//gtest
 GTEST_BUILD_DIR:= $(GTEST_DIR)/build
 GTEST_INSTALL_DIR:= $(GTEST_DIR)/install
 
@@ -13,12 +13,19 @@ TEST_OBJS:= $(TEST_SOURCES:.cpp=.o)
 
 SOURCES:= $(wildcard *.cpp)
 OBJS:= $(SOURCES:.cpp=.o)
+OBJS := $(filter-out main.o, $(OBJS))
 
 EXE:= test main compare
+ALL:= $(EXE) 
+
+ifeq ($(wildcard $(GTEST_INSTALL_DIR)/*), )
+	ALL:= gtestlib $(ALL)
+endif
+
 
 .PHONY: clean
 
-all: gtestlib $(EXE) 
+all: $(ALL) 
 
 -include *.d $(TEST_DIR)/*.d
 
@@ -35,7 +42,7 @@ $(TEST_DIR)/%.o: $(TEST_DIR)/%.cpp
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
-test: $(TEST_OBJS) 
+test: $(TEST_OBJS)
 	$(CXX) $(CXXFLAGS) $(TEST_FLAGS) -o $@ $^ $(LIB_FLAGS)
 
 main: main.o
@@ -45,4 +52,4 @@ compare: compare.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
-	rm -rf $(GTEST_BUILD_DIR) $(GTEST_INSTALL_DIR) $(EXE) $(OBJS) $(TEST_OBJS) *.d $(TEST_DIR)/*.d
+	rm -rf $(GTEST_BUILD_DIR) $(EXE) $(OBJS) $(TEST_OBJS) *.d $(TEST_DIR)/*.d
