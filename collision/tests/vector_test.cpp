@@ -3,7 +3,7 @@
 
 #include <cmath>
 
-#include "../vector.h"
+#include "../src/vector.h"
 
 
 TEST(Vector, addition)

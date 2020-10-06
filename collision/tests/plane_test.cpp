@@ -1,7 +1,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../plane.h"
+#include "../src/plane.h"
 
 TEST(plane, belong)
 {

@@ -1,6 +1,7 @@
-CXX:= g++
 
-CXXFLAGS:= -Wall -MD 
+CXX:= g++
+CXXFLAGS:= -Wall -MD
+SRC_DIR:= src
 TEST_DIR:= ./tests
 GTEST_DIR:= ../googletest
 GTEST_BUILD_DIR:= $(GTEST_DIR)/build
@@ -12,9 +13,9 @@ LIB_FLAGS:= -lgtest
 TEST_SOURCES:= $(wildcard $(TEST_DIR)/*.cpp)
 TEST_OBJS:= $(TEST_SOURCES:.cpp=.o)
 
-SOURCES:= $(wildcard *.cpp)
+SOURCES:= $(wildcard $(SRC_DIR)/*.cpp)
 OBJS:= $(SOURCES:.cpp=.o)
-OBJS := $(filter-out main.o, $(OBJS))
+TEST_OBJS := $(filter-out $(SRC_DIR)/main.o, $(OBJS)) $(TEST_OBJS)
 
 EXE:= test main
 ALL:= $(EXE)
@@ -27,7 +28,7 @@ endif
 
 all: $(ALL) 
 
--include *.d $(TEST_DIR)/*.d
+-include $(SRC_DIR)/*.d $(TEST_DIR)/*.d
 
 gtestlib:
 	@mkdir -p $(GTEST_BUILD_DIR) && cd $(GTEST_BUILD_DIR) && CXX=$(CXX) cmake -Dgtest_disable_pthreads=ON .. && make
@@ -41,14 +42,14 @@ $(TEST_DIR)/%.o: $(TEST_DIR)/%.cpp
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
-test: $(TEST_OBJS) $(OBJS)
+test: $(TEST_OBJS)
 	$(CXX) $(CXXFLAGS) $(TEST_FLAGS) -o $@ $^ $(LIB_FLAGS)
 
-main: main.o $(OBJS)
+main: $(SRC_DIR)/main.o $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
-	rm -rf $(EXE) $(OBJS) $(TEST_OBJS) *.d $(TEST_DIR)/*.d main.o
+	rm -rf $(EXE) $(OBJS) $(TEST_OBJS) $(SRC_DIR)/*.d $(TEST_DIR)/*.d main.o
 
 clean-all: clean
 	rm -rf $(GTEST_INSTALL_DIR) $(GTEST_BUILD_DIR)

@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 
-#include "../triangle.h"
+#include "../src/triangle.h"
 
 TEST(Triangle, plane)
 {
