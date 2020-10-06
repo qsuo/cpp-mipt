@@ -1,7 +1,7 @@
 CXX:= g++
 CXXFLAGS:= -Wall -MD 
 TEST_DIR:= ./tests
-GTEST_DIR:= ..//gtest
+GTEST_DIR:= ../googletest
 GTEST_BUILD_DIR:= $(GTEST_DIR)/build
 GTEST_INSTALL_DIR:= $(GTEST_DIR)/install
 
@@ -31,7 +31,7 @@ all: $(ALL)
 
 gtestlib:
 	@echo $(TEST_OBJS)
-	@mkdir -p $(GTEST_BUILD_DIR) && cd $(GTEST_BUILD_DIR) && CXX=$(CXX) cmake -Dgtest_disable_pthreads=ON ../googletest/ && make
+	@mkdir -p $(GTEST_BUILD_DIR) && cd $(GTEST_BUILD_DIR) && CXX=$(CXX) cmake -Dgtest_disable_pthreads=ON .. && make
 	@mkdir -p $(GTEST_INSTALL_DIR)
 	@cp -r $(GTEST_DIR)/googletest/include $(GTEST_INSTALL_DIR)
 	@cp -r $(GTEST_BUILD_DIR)/lib $(GTEST_INSTALL_DIR)
