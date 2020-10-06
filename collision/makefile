@@ -23,7 +23,7 @@ ifeq ($(wildcard $(GTEST_INSTALL_DIR)/*), )
 	ALL:= gtestlib $(ALL)
 endif
 
-.PHONY: clean
+.PHONY: clean clean-all
 
 all: $(ALL) 
 
@@ -49,4 +49,9 @@ main: main.o $(OBJS)
 
 clean:
 	rm -rf $(EXE) $(OBJS) $(TEST_OBJS) *.d $(TEST_DIR)/*.d main.o
+
+clean-all: clean
+	rm -rf $(GTEST_INSTALL_DIR) $(GTEST_BUILD_DIR)
+	
+
 
