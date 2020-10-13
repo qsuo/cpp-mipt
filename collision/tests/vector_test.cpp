@@ -62,4 +62,3 @@ TEST(Vector, crossProduct)
     ASSERT_TRUE(product == realProduct);
 }
 
-

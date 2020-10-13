@@ -25,7 +25,23 @@ TEST(Triangle, plane)
     ASSERT_TRUE(points[2] == p3);
 }
 
-TEST(Triangle, intersection)
+TEST(Triangle, area)
 {
-    //space::triangle t1
+    space::Triangle triangle(space::Vector(0, 0, 0),
+                             space::Vector(4, 0, 0),
+                             space::Vector(2, 4, 0));
+    double realArea = 4 * 4 / 2;
+    ASSERT_DOUBLE_EQ(triangle.area(), realArea);
+}
+
+TEST(Triangle, projection)
+{
+    space::Triangle triangle(space::Vector(1, 2, 3),
+                             space::Vector(4, 5, 6),
+                             space::Vector(7, 8, 9));
+    
+    auto onX = triangle.project(0);
+    auto onY = triangle.project(1);
+    auto onZ = triangle.project(2);
+
 }

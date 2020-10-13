@@ -20,14 +20,12 @@ public:
     
     Plane getPlane() const { return plane_; }
     const Points& getPoints() const { return points_; }
+    Triangle project(unsigned axis = 0) const;
+    
+    double area(); //TODO const???
 
-    static bool intersection(const Triangle &first, const Triangle &second);
-    static bool coplanarIntersection(const Triangle &first, const Triangle &second);
+    void dump() const;
 private:
-
-    bool fromOneSide(const Points& points) const;
-    std::vector<double> distances(const Points& points) const;
-
 
     Points points_;
     Plane plane_;
