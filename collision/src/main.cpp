@@ -3,6 +3,8 @@
 #include "triangle.h"
 #include "intersection.h"
 
+#include <iostream>
+
 int main()
 {
     /*
@@ -14,16 +16,16 @@ int main()
                       space::Vector(-1, -1, -1),
                       space::Vector(0, 3, 4));
     */
-    const space::Triangle first(space::Vector(0, 0, 0),
-                            space::Vector(4, 0, 0),
-                            space::Vector(2, 4, 0));
     
-    space::Triangle second(space::Vector(2, 0, 1.001),
-                       space::Vector(6, 1, -1),
-                       space::Vector(6, -1, -1));
+    space::Vector f1(0, 1, 0);
+    space::Vector f2(2, 1, 0);
+    space::Vector s1(0, 1, 0);
+    space::Vector s2(2, 1, 0);
+    
 
-   
-    space::intersection(second, first);
+    space::Vector norm(0, 0, 1);
+    bool a = space::line::intersection({f2, f1}, {s1, s2}, norm); 
+    std::cout << a << std::endl;
 
     return 0;
 }

@@ -14,6 +14,7 @@ Vector::Vector(const Vector &vec):
     x_(vec.x_), y_(vec.y_), z_(vec.z_) {}
 
 
+//TODO compare equal
 bool Vector::operator==(const Vector &vec) const
 {
     return ((std::abs(x_ - vec.x_) < EPS) &&

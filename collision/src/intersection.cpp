@@ -31,6 +31,7 @@ struct Interval
     double end;
 };
 
+
 SelectedPoints computeDistances(const space::Triangle &triangle, const space::Triangle::Points& points)
 {
     SelectedPoints spoints;
@@ -166,8 +167,39 @@ bool coplanarIntersection(const space::Triangle &first, const space::Triangle &s
 
 } // namespace
 
+
+
 namespace space
 {
+
+namespace line
+{
+
+bool intersection(Line line1, Line line2, space::Vector norm)
+{
+    auto r1 = line1.second - line1.first;
+    auto r2 = line2.second - line2.first;
+
+    auto cross1 = line2.second.crossProduct(line2.first).dotProduct(norm);
+    auto cross2 = line1.second.crossProduct(line1.first).dotProduct(norm);
+    auto gcross = r2.crossProduct(r1).dotProduct(norm);
+
+    auto tmp = line1.first - line2.first;
+    auto cmp = (r2.crossProduct(tmp).length()) / (r2.length() * tmp.length());
+    if(equal(cmp, 0))
+        return true;
+    auto r = (r1 * (cross1 / gcross) - r2 * (cross2 / gcross));
+
+    r.dump();
+    
+    auto t1 = (r - line1.first).dotProduct(r - line1.second); 
+    auto t2 = (r - line2.first).dotProduct(r - line2.second);
+    bool res1 = (t1 < 0) || equal(t1, 0); 
+    bool res2 = (t2 < 0) || equal(t2, 0);
+    return (res1 && res2);
+}
+
+} //namespace line
 
 bool intersection(const Triangle &first, const Triangle &second)
 {
