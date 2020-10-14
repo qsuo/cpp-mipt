@@ -159,15 +159,39 @@ bool coplanarIntersection(const space::Triangle &first, const space::Triangle &s
     auto ft = first.project();
     auto st = second.project();
 
-
     return false;
 }
+
+  
 
 
 } // namespace
 
 namespace space
 {
+
+bool lineIntersection(space::Vector f1, space::Vector f2,
+                      space::Vector s1, space::Vector s2)
+{
+    auto r1 = f2 - f1;
+    auto r2 = s2 - s1;
+
+    auto cross1 = s2.crossProduct(s1).z_;
+    auto cross2 = f2.crossProduct(f1).z_;
+    auto gcross = r2.crossProduct(r1).z_;
+
+
+    auto r = (r1 * (cross1 / gcross) - r2 * (cross2 / gcross));
+
+    r.dump();
+    
+    auto t1 = (r - f1).dotProduct(r - f2); 
+    auto t2 = (r - s1).dotProduct(r - s2);
+    bool res1 = (t1 < 0) || equal(t1, 0); 
+    bool res2 = (t2 < 0) || equal(t2, 0);
+    return (res1 && res2);
+}
+
 
 bool intersection(const Triangle &first, const Triangle &second)
 {

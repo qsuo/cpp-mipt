@@ -9,91 +9,17 @@
 namespace space
 {
 
-
-Vector::Vector(const Vector &vec):
-    x_(vec.x_), y_(vec.y_), z_(vec.z_) {}
-
-
-bool Vector::operator==(const Vector &vec) const
+Vector3d crossProduct(const Vector3d &lhs, const Vector3d &rhs)
 {
-    return ((std::abs(x_ - vec.x_) < EPS) &&
-            (std::abs(y_ - vec.y_) < EPS) &&
-            (std::abs(z_ - vec.z_) < EPS));
+    double x = lhs[1] * rhs[2] - lhs[2] * rhs[1];
+    double y = lhs[2] * rhs[0] - lhs[0] * rhs[2];
+    double z = lhs[0] * rhs[1] - lhs[1] * rhs[0];
+    return Vector3d({x, y, z});
 }
 
-Vector Vector::operator+(const Vector &vec)
+double pseudoProduct(const Vector2d &lhs, const Vector2d &rhs)
 {
-    return Vector(x_ + vec.x_,
-                  y_ + vec.y_,
-                  z_ + vec.z_);
-}
-
-Vector &Vector::operator+=(const Vector &vec)
-{
-    x_ += vec.x_;
-    y_ += vec.y_,
-    z_ += vec.z_;
-    return *this;
-}
-
-Vector Vector::operator-(const Vector &vec)
-{
-    return Vector(x_ - vec.x_,
-                  y_ - vec.y_,
-                  z_ - vec.z_);
-}
-
-Vector &Vector::operator-=(const Vector &vec)
-{
-    x_ -= vec.x_;
-    y_ -= vec.y_,
-    z_ -= vec.z_;
-    return *this;
-}
-
-Vector Vector::operator*(double val)
-{
-    return Vector(x_ * val,
-                  y_ * val,
-                  z_ * val);
-}
-
-Vector &Vector::operator*=(double val)
-{
-    x_ *= val;
-    y_ *= val,
-    z_ *= val;
-    return *this;
-}
-
-double Vector::length() const
-{
-    double len = std::sqrt(x_ * x_ +
-                           y_ * y_ +
-                           z_ * z_);
-    return len;
-}
-
-double Vector::dotProduct(const Vector &vec) const
-{
-    double product = x_ * vec.x_ +
-                    y_ * vec.y_ +
-                    z_ * vec.z_;
-    return product;
-}
-
-
-Vector Vector::crossProduct(const Vector &vec) const
-{
-    double x = y_ * vec.z_ - z_ * vec.y_;
-    double y = z_ * vec.x_ - x_ * vec.z_;
-    double z = x_ * vec.y_ - y_ * vec.x_;
-    return Vector(x, y, z);
-}
-
-void Vector::dump() const
-{
-    std::cout << "(" << x_ << ", " << y_ << ", " << z_ << ")" << std::endl;
+    return lhs[0] * lhs[1] - lhs[1] * rhs[0];
 }
 
 } //namespace space

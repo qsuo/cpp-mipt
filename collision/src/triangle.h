@@ -10,6 +10,7 @@
 namespace space
 {
 
+template <size_t DIM = 3>
 class Triangle
 {
 public:

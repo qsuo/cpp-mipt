@@ -1,5 +1,6 @@
 
 #include "plane.h"
+#include "vector.h"
 
 #include "common.h"
 
@@ -11,16 +12,16 @@ namespace space
 {
 
 
-double Plane::distance(const Vector &point) const
+double Plane::distance(const Vector3d &point) const
 {
-    double dist = normal_.dotProduct(point) + member_;
+    double dist = dotProduct(normal_, point) + member_;
     return dist;
 }
 
-bool Plane::belong(const Vector &point) const
+bool Plane::belong(const Vector3d &point) const
 {
     auto dist = distance(point);
-    return (std::abs(dist) < EPS);
+    return (equal(dist, 0));
 }
 
 } // namespace space

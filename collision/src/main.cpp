@@ -1,7 +1,9 @@
 
 #include "vector.h"
-#include "triangle.h"
-#include "intersection.h"
+//#include "triangle.h"
+//#include "intersection.h"
+
+#include <iostream>
 
 int main()
 {
@@ -14,16 +16,9 @@ int main()
                       space::Vector(-1, -1, -1),
                       space::Vector(0, 3, 4));
     */
-    const space::Triangle first(space::Vector(0, 0, 0),
-                            space::Vector(4, 0, 0),
-                            space::Vector(2, 4, 0));
-    
-    space::Triangle second(space::Vector(2, 0, 1.001),
-                       space::Vector(6, 1, -1),
-                       space::Vector(6, -1, -1));
+    space::Vector<3> v({1, 2, 3});
+    space::Vector<3> v1({1, 5, 3});
 
-   
-    space::intersection(second, first);
-
+    std::cout << space::dotProduct(v, v1) << std::endl;
     return 0;
 }
