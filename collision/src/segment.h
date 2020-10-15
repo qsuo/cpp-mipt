@@ -20,7 +20,7 @@ struct Segment
     
 };
 
-bool intersection(Segment first, Segment second);
+bool intersection(const Segment &first, const Segment &second);
 
 }// namespace dim2
 }// namespace space

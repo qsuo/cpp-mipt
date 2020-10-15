@@ -30,6 +30,12 @@ double pseudoProduct(const Vector &lhs, const Vector &rhs)
     return lhs[0] * rhs[1] - lhs[1] * rhs[0];
 }
 
+dim3::Vector crossProduct(const Vector &lhs, const Vector &rhs)
+{
+    double z = lhs[0] * rhs[1] - lhs[1] * rhs[0];
+    return dim3::Vector({0, 0, z});
+}
+
 
 }// namespace 2d
 

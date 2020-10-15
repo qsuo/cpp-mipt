@@ -24,7 +24,7 @@ public:
     
     const Points& getPoints() const { return points_; }
     
-    double area(); //TODO const???
+    double area() const;
 
     void dump() const;
 private:
@@ -48,7 +48,7 @@ public:
     const Points& getPoints() const { return points_; }
     dim2::Triangle project(size_t axis = 0) const;
     
-    double area(); //TODO const???
+    double area() const;
 
     void dump() const;
 private:

@@ -1,6 +1,8 @@
 
 #include "triangle.h"
 #include "common.h"
+#include "vector.h"
+#include "plane.h"
 
 #include <cassert>
 #include <iostream>
@@ -22,7 +24,7 @@ points_{v1, v2, v3}
     plane_ = dim3::Plane(normal, member);
 }
 
-double Triangle::area()
+double Triangle::area() const
 {
     auto a = points_[1] - points_[0];
     auto b = points_[2] - points_[0];
@@ -54,11 +56,11 @@ Triangle::Triangle(const Vector &v1, const Vector &v2, const Vector &v3):
 points_{v1, v2, v3}
 {}
 
-double Triangle::area()
+double Triangle::area() const
 {
     auto a = points_[1] - points_[0];
     auto b = points_[2] - points_[0];
-    double s = pseudoProduct(a, b) / 2;
+    double s = crossProduct(a, b).length() / 2;
     return s;
 }
 

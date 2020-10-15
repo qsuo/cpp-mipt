@@ -2,6 +2,7 @@
 #include "intersection.h"
 #include "vector.h"
 #include "common.h"
+#include "segment.h"
 #include "triangle.h"
 
 #include <cstdio>
@@ -9,6 +10,7 @@
 #include <cmath>
 #include <cassert>
 #include <array>
+#include <algorithm>
 
 namespace
 {
@@ -156,45 +158,87 @@ bool overlap(Interval in1, Interval in2)
     return false;
 }
 
+bool sameSide(space::dim2::Vector p1, space::dim2::Vector p2, space::dim2::Segment segment)
+{
+    auto prod1 = space::dim2::crossProduct(segment.point2 - segment.point1, p1 - segment.point1);
+    auto prod2 = space::dim2::crossProduct(segment.point2 - segment.point1, p2 - segment.point1);
+    auto sprod = space::dotProduct(prod1, prod2);
+    if(sprod > 0 || space::equal(sprod, 0))
+        return true;
+    return false;
+}
+
+bool pointInsideTriangle(space::dim2::Vector point, space::dim2::Triangle &triangle)
+{
+    auto tpoints = triangle.getPoints();
+    bool in = (sameSide(point, tpoints[0], {tpoints[1], tpoints[2]})) &&
+              (sameSide(point, tpoints[1], {tpoints[2], tpoints[0]})) &&
+              (sameSide(point, tpoints[2], {tpoints[0], tpoints[1]}));
+    return in;
+}
+
+size_t mostAreaAxis(const space::dim3::Triangle &first, const space::dim3::Triangle &second)
+{
+    size_t axis = 0;
+    double maxArea = 0;
+    for(size_t i = 0; i < 3; ++i)
+    {
+        auto area = first.project(i).area();
+        if(area > maxArea)
+        {
+            area = maxArea;
+            axis = i;
+        }
+    }
+    return axis;
+}
+
+bool edgesIntersection(const std::vector<space::dim2::Segment> &fedges, const std::vector<space::dim2::Segment> &sedges)
+{
+    for(size_t i = 0; i < fedges.size(); ++i)
+    {
+        for(size_t j = 0; j < sedges.size(); ++j)
+        {
+            if(space::dim2::intersection(fedges[i], sedges[j]))
+                return true;
+        }
+    }
+    return false;
+}
+
 bool coplanarIntersection(const space::dim3::Triangle &first, const space::dim3::Triangle &second)
 {
-    auto ft = first.project(2);
-    auto st = second.project(2);
-     
+    auto axis = mostAreaAxis(first, second);
 
-    return true;
+    auto pfirst = first.project(axis);
+    auto psecond = second.project(axis);
+    
+    std::vector<space::dim2::Segment> fsides;
+    std::vector<space::dim2::Segment> ssides;
+    
+    auto fpoints = pfirst.getPoints();
+    auto spoints = psecond.getPoints();
+    for(size_t i = 1, size = fpoints.size(); i <= size; ++i)
+    {
+        fsides.push_back({fpoints[i % size], fpoints[i - 1]});
+        ssides.push_back({spoints[i % size], spoints[i - 1]});
+    }
+
+    if(edgesIntersection(fsides, ssides))
+        return true;
+
+    if(pointInsideTriangle(fpoints[0], psecond) || pointInsideTriangle(spoints[0], pfirst))
+        return true;
+    
+    return false;
+
 }
-  
 
 
 } // namespace
 
 namespace space
 {
-
-/*
-bool lineIntersection(space::Vector f1, space::Vector f2,
-                      space::Vector s1, space::Vector s2)
-{
-    auto r1 = f2 - f1;
-    auto r2 = s2 - s1;
-
-    auto cross1 = s2.crossProduct(s1).z_;
-    auto cross2 = f2.crossProduct(f1).z_;
-    auto gcross = r2.crossProduct(r1).z_;
-
-
-    auto r = (r1 * (cross1 / gcross) - r2 * (cross2 / gcross));
-
-    r.dump();
-    
-    auto t1 = (r - f1).dotProduct(r - f2); 
-    auto t2 = (r - s1).dotProduct(r - s2);
-    bool res1 = (t1 < 0) || equal(t1, 0); 
-    bool res2 = (t2 < 0) || equal(t2, 0);
-    return (res1 && res2);
-}
-*/
 
 namespace dim3
 {

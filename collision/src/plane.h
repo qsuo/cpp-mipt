@@ -17,7 +17,6 @@ public:
 
     Plane(const Vector &normal, double member):
         normal_(normal), member_(member) {}
-    //Plane(const Vector &Plane);
 
     double distance(const Vector &point) const;
     bool belong(const Vector &point) const;

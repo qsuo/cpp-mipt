@@ -1,7 +1,6 @@
 
 #include "plane.h"
 #include "vector.h"
-
 #include "common.h"
 
 #include <iostream>
