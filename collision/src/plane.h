@@ -7,26 +7,30 @@
 namespace space
 {
 
+namespace dim3
+{
+
 class Plane
 {
 public:
-    Plane(): normal_(Vector3d({0, 0, 0})), member_(0) {}
+    Plane(): normal_(Vector({0, 0, 0})), member_(0) {}
 
-    Plane(const Vector3d &normal, double member):
+    Plane(const Vector &normal, double member):
         normal_(normal), member_(member) {}
     //Plane(const Vector &Plane);
 
-    double distance(const Vector3d &point) const;
-    bool belong(const Vector3d &point) const;
+    double distance(const Vector &point) const;
+    bool belong(const Vector &point) const;
 
-    Vector3d getNormal() const { return normal_; }
+    Vector getNormal() const { return normal_; }
     double getMember() const { return member_; }
 private:
 
-    Vector3d normal_;
+    Vector normal_;
     double member_;
 };
 
-} // space
+} // namespace dim3
+} // namespace space
 
 #endif

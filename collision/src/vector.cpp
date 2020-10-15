@@ -9,17 +9,28 @@
 namespace space
 {
 
-Vector3d crossProduct(const Vector3d &lhs, const Vector3d &rhs)
+namespace dim3
+{
+
+Vector crossProduct(const Vector &lhs, const Vector &rhs)
 {
     double x = lhs[1] * rhs[2] - lhs[2] * rhs[1];
     double y = lhs[2] * rhs[0] - lhs[0] * rhs[2];
     double z = lhs[0] * rhs[1] - lhs[1] * rhs[0];
-    return Vector3d({x, y, z});
+    return Vector({x, y, z});
 }
 
-double pseudoProduct(const Vector2d &lhs, const Vector2d &rhs)
+}// namespace 3d
+
+namespace dim2
 {
-    return lhs[0] * lhs[1] - lhs[1] * rhs[0];
+
+double pseudoProduct(const Vector &lhs, const Vector &rhs)
+{
+    return lhs[0] * rhs[1] - lhs[1] * rhs[0];
 }
+
+
+}// namespace 2d
 
 } //namespace space

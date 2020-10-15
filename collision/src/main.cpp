@@ -17,8 +17,8 @@ int main()
                       space::Vector(0, 3, 4));
     */
     space::Vector<3> v({1, 2, 3});
-    space::Vector<3> v1({1, 5, 3});
-
-    std::cout << space::dotProduct(v, v1) << std::endl;
+    v.dump();
+    auto vv = v.project(0);
+    vv.dump();
     return 0;
 }

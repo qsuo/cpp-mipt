@@ -2,6 +2,7 @@
 #include "intersection.h"
 #include "vector.h"
 #include "common.h"
+#include "triangle.h"
 
 #include <cstdio>
 #include <iostream>
@@ -12,9 +13,10 @@
 namespace
 {
 
+
 struct DistPoint
 {
-    space::Vector point;
+    space::dim3::Vector point;
     double dist;
 };
 
@@ -31,7 +33,7 @@ struct Interval
     double end;
 };
 
-SelectedPoints computeDistances(const space::Triangle &triangle, const space::Triangle::Points& points)
+SelectedPoints computeDistances(const space::dim3::Triangle &triangle, const space::dim3::Triangle::Points& points)
 {
     SelectedPoints spoints;
     auto plane = triangle.getPlane();
@@ -106,7 +108,7 @@ void classifyPoints(std::vector<DistPoint> &major, std::vector<DistPoint> &minor
 
 }
 
-Interval intersectionInterval(SelectedPoints &points, const space::Vector line)
+Interval intersectionInterval(SelectedPoints &points, const space::dim3::Vector line)
 {
     std::vector<DistPoint> major;
     std::vector<DistPoint> minor;
@@ -119,10 +121,10 @@ Interval intersectionInterval(SelectedPoints &points, const space::Vector line)
     std::vector<double> proj;
     for(const auto &p : major)
     {
-        double tproj = p.point.dotProduct(line);
+        double tproj = dotProduct(p.point, line);
         proj.push_back(tproj);
     }
-    proj.push_back(minor[0].point.dotProduct(line));
+    proj.push_back(dotProduct(minor[0].point, line));
    
     std::vector<double> interval;
     for(decltype(major.size()) i = 0; i < major.size(); i++)
@@ -154,14 +156,14 @@ bool overlap(Interval in1, Interval in2)
     return false;
 }
 
-bool coplanarIntersection(const space::Triangle &first, const space::Triangle &second)
+bool coplanarIntersection(const space::dim3::Triangle &first, const space::dim3::Triangle &second)
 {
-    auto ft = first.project();
-    auto st = second.project();
+    auto ft = first.project(2);
+    auto st = second.project(2);
+     
 
-    return false;
+    return true;
 }
-
   
 
 
@@ -170,6 +172,7 @@ bool coplanarIntersection(const space::Triangle &first, const space::Triangle &s
 namespace space
 {
 
+/*
 bool lineIntersection(space::Vector f1, space::Vector f2,
                       space::Vector s1, space::Vector s2)
 {
@@ -191,13 +194,16 @@ bool lineIntersection(space::Vector f1, space::Vector f2,
     bool res2 = (t2 < 0) || equal(t2, 0);
     return (res1 && res2);
 }
+*/
 
+namespace dim3
+{
 
 bool intersection(const Triangle &first, const Triangle &second)
 {
+    
     auto fpoints = computeDistances(first, second.getPoints());
     auto spoints = computeDistances(second, first.getPoints());
-   
     if(fromOneSide(fpoints) || fromOneSide(spoints))
         return false;
 
@@ -209,12 +215,14 @@ bool intersection(const Triangle &first, const Triangle &second)
 
     auto fplane = first.getPlane();
     auto splane = second.getPlane();
-    auto intersectLine = fplane.getNormal().crossProduct(splane.getNormal());
+    auto intersectLine = crossProduct(fplane.getNormal(), splane.getNormal());
     
     auto finterval =  intersectionInterval(fpoints, intersectLine);   
     auto sinterval =  intersectionInterval(spoints, intersectLine);   
     
     return overlap(finterval, sinterval);
+}
+
 }
 
 } // namespace space

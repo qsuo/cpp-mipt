@@ -30,18 +30,12 @@ public:
     Vector &operator*=(double val);
     
     //TODO replace
-    double& operator[](size_t index)
-    {
-        return coords_[index];    
-    }
-
-    const double& operator[](size_t index) const
-    {
-        return coords_[index];    
-    }
+    double& operator[](size_t index) { return coords_[index]; }
+    const double& operator[](size_t index) const { return coords_[index]; }
      
     double length() const;
-
+    
+    Vector<Vsize - 1> project(size_t axis) const;
     //Vector crossProduct(const Vector &vec) const;
     //double pseudoProduct(const Vector &vec) const;
 
@@ -56,8 +50,6 @@ private:
 
 };
 
-using Vector2d = Vector<2>;
-using Vector3d = Vector<3>;
 
 template <size_t Vsize>
 Vector<Vsize>::Vector(const Vector &vec): coords_(vec.coords_) 
@@ -161,8 +153,36 @@ double dotProduct(const Vector<Vsize> &lhs, const Vector<Vsize> &rhs)
     return product;
 }
 
-Vector3d crossProduct(const Vector3d &lhs, const Vector3d &rhs);
-double pseudoProduct(const Vector2d &lhs, const Vector2d &rhs);
+template <size_t Vsize>
+Vector<Vsize - 1> Vector<Vsize>::project(size_t axis) const
+{
+    std::array<double, Vsize - 1> vector = {};
+    for(size_t i = 0, j = 0; i < Vsize; i++)
+    {
+        if(i == axis)
+            continue;
+        vector[j++] = coords_[i];
+    }
+    return vector;
+}
+
+namespace dim3
+{
+
+using Vector = Vector<3>;
+
+Vector crossProduct(const Vector &lhs, const Vector &rhs);
+
+}// namespace 3d
+
+namespace dim2
+{
+    
+using Vector = Vector<2>;
+
+double pseudoProduct(const Vector &lhs, const Vector &rhs);
+
+}// namespace 2d
 
 }//namespace space
 

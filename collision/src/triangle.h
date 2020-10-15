@@ -6,22 +6,47 @@
 #include "plane.h"
 
 #include <vector>
+#include <array>
 
 namespace space
 {
 
-template <size_t DIM = 3>
+
+namespace dim2
+{
+
+class Triangle
+{
+public:
+    using Points = std::array<Vector, 3>;
+
+    Triangle(const Vector &v1, const Vector &v2, const Vector &v3);
+    
+    const Points& getPoints() const { return points_; }
+    
+    double area(); //TODO const???
+
+    void dump() const;
+private:
+    Points points_;
+};
+
+}// namespace dim2
+
+namespace dim3
+{
+
 class Triangle
 {
 public:
     
-    using Points = std::vector<Vector>;
+    using Points = std::array<Vector, 3>;
 
     Triangle(const Vector &v1, const Vector &v2, const Vector &v3);
     
     Plane getPlane() const { return plane_; }
     const Points& getPoints() const { return points_; }
-    Triangle project(unsigned axis = 0) const;
+    dim2::Triangle project(size_t axis = 0) const;
     
     double area(); //TODO const???
 
@@ -29,8 +54,11 @@ public:
 private:
 
     Points points_;
-    Plane plane_;
+    dim3::Plane plane_;
 };
+
+}// namespace dim3
+
 
 } // namespace space
 
