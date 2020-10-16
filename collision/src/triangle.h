@@ -3,67 +3,53 @@
 #define TRIANGLE_H
 
 #include "vector.h"
+#include "segment.h"
 #include "plane.h"
-
-#include <vector>
-#include <array>
 
 namespace space
 {
 
-
-namespace dim2
-{
-
+template <size_t Dim>
 class Triangle
 {
+    static_assert(2 <= Dim && Dim <= 3);
 public:
-    using Points = std::array<Vector, 3>;
-
-    Triangle(const Vector &v1, const Vector &v2, const Vector &v3);
     
-    const Points& getPoints() const { return points_; }
+    using Points = std::array<Vector<Dim>, 3>;
+    using Edges = std::array<Segment<Dim>, 3>;
+
+    Triangle(const Vector<Dim> &v1, const Vector<Dim> &v2, const Vector<Dim> &v3);
+    Points getPoints() const { return points_; }
+    Edges getEdges() const { return edges_; }
     
     double area() const;
 
-    void dump() const;
-private:
-    Points points_;
-};
-
-bool intersection(const Triangle &first, const Triangle &second);
-
-}// namespace dim2
-
-namespace dim3
-{
-
-class Triangle
-{
-public:
-    
-    using Points = std::array<Vector, 3>;
-
-    Triangle(const Vector &v1, const Vector &v2, const Vector &v3);
-    
-    Plane getPlane() const { return plane_; }
-    const Points& getPoints() const { return points_; }
-    dim2::Triangle project(size_t axis = 0) const;
-    
-    double area() const;
-
-    void dump() const;
 private:
 
     Points points_;
-    dim3::Plane plane_;
+    Edges edges_;
 };
 
-bool intersection(const Triangle &first, const Triangle &second);
 
-}// namespace dim3
+template <size_t Dim>
+Triangle<Dim>::Triangle(const Vector<Dim> &v1, const Vector<Dim> &v2, const Vector<Dim> &v3):
+    points_{v1, v2, v3},
+    edges_{ Segment<Dim>(v2, v1), Segment<Dim>(v3, v2), Segment<Dim>(v1, v3) }
+    {}
 
+template <size_t Dim>
+double Triangle<Dim>::area() const
+{
+    auto a = points_[1] - points_[0];
+    auto b = points_[2] - points_[0];
+    double s = crossProduct(a, b).length() / 2;
+    return s;
+}
 
-} // namespace space
+Plane getPlane(const Triangle<3> &triangle);
+
+Triangle<2> project(const Triangle<3> &triangle, size_t axis);
+
+}// namespace space
 
 #endif

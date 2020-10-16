@@ -10,12 +10,12 @@
 namespace space
 {
 
-template <size_t Vsize>
+template <size_t Dim>
 class Vector
 {
 public:
 
-    using Coordinates = std::array<double, Vsize>;
+    using Coordinates = std::array<double, Dim>;
     
     
     Vector(const Coordinates &coords);
@@ -30,7 +30,7 @@ public:
     const double& operator[](size_t index) const { return coords_[index]; }
 
     double length() const;
-    Vector<Vsize - 1> project(size_t axis) const;
+    Vector<Dim - 1> project(size_t axis) const;
     
     void dump() const;
 private:
@@ -40,65 +40,86 @@ private:
 };
 
 
-template <size_t Vsize>
-Vector<Vsize>::Vector(const Vector &vec): coords_(vec.coords_) 
+template <size_t Dim>
+Vector<Dim>::Vector(const Vector &vec): coords_(vec.coords_) 
 {}
 
-template <size_t Vsize>
-Vector<Vsize>::Vector(const Coordinates &coords): coords_(coords)
+template <size_t Dim>
+Vector<Dim>::Vector(const Coordinates &coords): coords_(coords)
 {}
 
-template <size_t Vsize>
-bool Vector<Vsize>::operator==(const Vector &vec) const
+template <size_t Dim>
+bool Vector<Dim>::operator==(const Vector &vec) const
 {
-    bool eq = true;
-    for(size_t i = 0; i < Vsize; ++i)
+    for(size_t i = 0; i < Dim; ++i)
     {
         if(!equal(coords_[i], vec.coords_[i]))
-        {
-            eq = false;
-            break;
-        }
+            return false;
     }
-    return eq;
+
+    return true;
 }
 
-template <size_t Vsize>
-Vector<Vsize> &Vector<Vsize>::operator+=(const Vector &vec)
+template <size_t Dim>
+Vector<Dim> &Vector<Dim>::operator+=(const Vector &vec)
 {
-    for(size_t i = 0; i < Vsize; ++i)
+    for(size_t i = 0; i < Dim; ++i)
         coords_[i] += vec.coords_[i];
     return *this;
 }
 
-template <size_t Vsize>
-Vector<Vsize> &Vector<Vsize>::operator-=(const Vector &vec)
+template <size_t Dim>
+Vector<Dim> &Vector<Dim>::operator-=(const Vector &vec)
 {
-    for(size_t i = 0; i < Vsize; ++i)
+    for(size_t i = 0; i < Dim; ++i)
         coords_[i] -= vec.coords_[i];
     return *this;
 }
 
-template <size_t Vsize>
-Vector<Vsize> &Vector<Vsize>::operator*=(double val)
+template <size_t Dim>
+Vector<Dim> &Vector<Dim>::operator*=(double val)
 {
-    for(size_t i = 0; i < Vsize; ++i)
+    for(size_t i = 0; i < Dim; ++i)
         coords_[i] *= val;
     return *this;
 }
 
-template <size_t Vsize>
-double Vector<Vsize>::length() const
+template <size_t Dim>
+double Vector<Dim>::length() const
 {
-    double len = 0;
-    for(size_t i = 0; i < Vsize; ++i)
-        len += coords_[i] * coords_[i];
+    double plen = 0;
+    for(size_t i = 0; i < Dim; ++i)
+        plen += coords_[i] * coords_[i];
 
-    return std::sqrt(len);
+    return std::sqrt(plen);
 }
 
-template <size_t Vsize>
-void Vector<Vsize>::dump() const
+template <size_t Dim>
+Vector<Dim> operator+(const Vector<Dim> &lhs, const Vector<Dim> &rhs)
+{
+    Vector<Dim> tmp(lhs);
+    tmp += rhs;
+    return tmp;
+}
+
+template <size_t Dim>
+Vector<Dim> operator-(const Vector<Dim> &lhs, const Vector<Dim> &rhs)
+{
+    Vector<Dim> tmp(lhs);
+    tmp -= rhs;
+    return tmp;
+}
+
+template <size_t Dim>
+Vector<Dim> operator*(const Vector<Dim> &lhs, double rhs)
+{
+    Vector<Dim> tmp(lhs);
+    tmp *= rhs;
+    return tmp;
+}
+
+template <size_t Dim>
+void Vector<Dim>::dump() const
 {
     std::cout << "(";
     for(auto c : coords_)
@@ -106,46 +127,20 @@ void Vector<Vsize>::dump() const
     std::cout << ")" << std::endl;
 }
 
-template <size_t Vsize>
-Vector<Vsize> operator+(const Vector<Vsize> &lhs, const Vector<Vsize> &rhs)
-{
-    Vector<Vsize> tmp(lhs);
-    tmp += rhs;
-    return tmp;
-}
-
-template <size_t Vsize>
-Vector<Vsize> operator-(const Vector<Vsize> &lhs, const Vector<Vsize> &rhs)
-{
-    Vector<Vsize> tmp(lhs);
-    tmp -= rhs;
-    return tmp;
-}
-
-template <size_t Vsize>
-Vector<Vsize> operator*(const Vector<Vsize> &lhs, double rhs)
-{
-    Vector<Vsize> tmp(lhs);
-    tmp *= rhs;
-    return tmp;
-}
-
-
-
-template <size_t Vsize>
-double dotProduct(const Vector<Vsize> &lhs, const Vector<Vsize> &rhs)
+template <size_t Dim>
+double dotProduct(const Vector<Dim> &lhs, const Vector<Dim> &rhs)
 {
     double product = 0;
-    for(size_t i = 0; i < Vsize; ++i)
+    for(size_t i = 0; i < Dim; ++i)
         product += lhs[i] * rhs[i];
     return product;
 }
 
-template <size_t Vsize>
-Vector<Vsize - 1> Vector<Vsize>::project(size_t axis) const
+template <size_t Dim>
+Vector<Dim - 1> Vector<Dim>::project(size_t axis) const
 {
-    std::array<double, Vsize - 1> vector = {};
-    for(size_t i = 0, j = 0; i < Vsize; i++)
+    std::array<double, Dim - 1> vector = {};
+    for(size_t i = 0, j = 0; i < Dim; i++)
     {
         if(i == axis)
             continue;
@@ -154,26 +149,13 @@ Vector<Vsize - 1> Vector<Vsize>::project(size_t axis) const
     return vector;
 }
 
-namespace dim3
-{
 
-using Vector = Vector<3>;
+Vector<3> crossProduct(const Vector<3> &lhs, const Vector<3> &rhs);
+Vector<3> crossProduct(const Vector<2> &lhs, const Vector<2> &rhs);
 
-Vector crossProduct(const Vector &lhs, const Vector &rhs);
+double pseudoProduct(const Vector<2> &lhs, const Vector<2> &rhs);
 
-}// namespace 3d
-
-namespace dim2
-{
-    
-using Vector = Vector<2>;
-
-double pseudoProduct(const Vector &lhs, const Vector &rhs);
-dim3::Vector crossProduct(const Vector &lhs, const Vector &rhs);
-
-}// namespace 2d
-
-}//namespace space
+}// namespace space
 
 
 #endif

@@ -7,21 +7,19 @@
 namespace space
 {
 
-namespace dim2
-{
-
+template <size_t Dim>
 struct Segment
 {
-    Segment(Vector p1, Vector p2): point1(p1), point2(p2), vector(p2 - p1) {}
+    Segment(Vector<Dim> p1, Vector<Dim> p2): 
+        a(p1), b(p2), vector(b - a) {}
     
-    Vector point1;
-    Vector point2;
-    Vector vector;
+    Vector<Dim> a;
+    Vector<Dim> b;
+    Vector<Dim> vector;
     
 };
 
-bool intersection(const Segment &first, const Segment &second);
 
-}// namespace dim2
 }// namespace space
+
 #endif

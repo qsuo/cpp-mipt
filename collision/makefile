@@ -1,13 +1,13 @@
 
 CXX:= g++
 CXXFLAGS:= -Wall -MD
-SRC_DIR:= src
+SRC_DIR:= ./src
 TEST_DIR:= ./tests
 GTEST_DIR:= ../googletest
 GTEST_BUILD_DIR:= $(GTEST_DIR)/build
 GTEST_INSTALL_DIR:= $(GTEST_DIR)/install
 
-TEST_FLAGS:= -I$(GTEST_INSTALL_DIR)/include/ -L$(GTEST_INSTALL_DIR)/lib/
+TEST_FLAGS:= -I$(GTEST_INSTALL_DIR)/include/ -I$(SRC_DIR) -L$(GTEST_INSTALL_DIR)/lib/
 LIB_FLAGS:= -lgtest
 
 TEST_SOURCES:= $(wildcard $(TEST_DIR)/*.cpp)

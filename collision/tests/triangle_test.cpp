@@ -2,18 +2,19 @@
 #include <gtest/gtest.h>
 #include <iostream>
 
-#include "../src/triangle.h"
+#include "vector.h"
+#include "triangle.h"
 
 TEST(Triangle, plane)
 {
-    space::dim3::Vector p1({0, 0, 1});
-    space::dim3::Vector p2({1, 1, 1});
-    space::dim3::Vector p3({1, 2, 1});
-    space::dim3::Triangle triangle(p1, p2, p3);
+    space::Vector<3> p1({0, 0, 1});
+    space::Vector<3> p2({1, 1, 1});
+    space::Vector<3> p3({1, 2, 1});
+    space::Triangle<3> triangle(p1, p2, p3);
 
-    auto plane = triangle.getPlane();
+    auto plane = getPlane(triangle);
     
-    space::dim3::Vector realNormal({0, 0, 1});
+    space::Vector<3> realNormal({0, 0, 1});
     double realMember = -1.0;
 
     ASSERT_TRUE(plane.getNormal() == realNormal);
@@ -27,17 +28,17 @@ TEST(Triangle, plane)
 
 TEST(Triangle, area)
 {
-    space::dim3::Triangle triangle(space::dim3::Vector({0, 0, 0}),
-                                   space::dim3::Vector({4, 0, 0}),
-                                   space::dim3::Vector({2, 4, 0}));
+    space::Triangle<3> triangle(space::Vector<3>({0, 0, 0}),
+                                space::Vector<3>({4, 0, 0}),
+                                space::Vector<3>({2, 4, 0}));
     double realArea = 4 * 4 / 2;
     ASSERT_DOUBLE_EQ(triangle.area(), realArea);
 }
 
 TEST(Triangle, projection)
 {
-    space::dim3::Triangle triangle(space::dim3::Vector({1, 2, 3}),
-                                   space::dim3::Vector({4, 5, 6}),
-                                   space::dim3::Vector({7, 8, 9}));
+    space::Triangle<3> triangle(space::Vector<3>({1, 2, 3}),
+                                space::Vector<3>({4, 5, 6}),
+                                space::Vector<3>({7, 8, 9}));
 
 }
