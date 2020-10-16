@@ -2,7 +2,6 @@
 #include <gtest/gtest.h>
 
 
-#include "../src/intersection.h"
 #include "../src/triangle.h"
 
 const space::dim3::Triangle deftr(space::dim3::Vector({0, 0, 0}),

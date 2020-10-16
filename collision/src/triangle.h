@@ -31,6 +31,8 @@ private:
     Points points_;
 };
 
+bool intersection(const Triangle &first, const Triangle &second);
+
 }// namespace dim2
 
 namespace dim3
@@ -56,6 +58,8 @@ private:
     Points points_;
     dim3::Plane plane_;
 };
+
+bool intersection(const Triangle &first, const Triangle &second);
 
 }// namespace dim3
 
