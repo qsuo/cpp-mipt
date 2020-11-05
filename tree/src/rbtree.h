@@ -23,13 +23,30 @@ private:
 
         KeyT key;
 
-        explicit Node(): parent(nullptr), left(nullptr), right(nullptr) {}
-        Node(const KeyT &ckey): key(ckey) {}
+        Node():
+            parent(nullptr),
+            left(nullptr),
+            right(nullptr)
+        {}
+        
+        Node(const KeyT &ckey): 
+            parent(nullptr),
+            left(nullptr),
+            right(nullptr),
+            color(RED),
+            key(ckey)       
+        {}
+
         Node(Node *cparent, Node *cleft, Node *cright, Color ccolor, const KeyT &ckey):
-            parent(cparent), left(cleft), right(cright), color(ccolor), key(ckey) {}
+            parent(cparent),
+            left(cleft),
+            right(cright),
+            color(ccolor),
+            key(ckey)
+        {}
         
 
-        void dump() const
+        void dumpDot() const
         {
             std::string colors = (color == RED) ? 
                                 "fillcolor=red, fontcolor=black, style=filled" :
@@ -49,11 +66,10 @@ public:
     const Node* find(const KeyT &key) const;
     void remove(const KeyT &key);
     
-    void dump() const;
-       
     Node* lowerBound(const KeyT &key) const;
-
     size_t rangeQuery(const KeyT &low, const KeyT &high) const;
+
+    void dumpDot() const;
 
 private:
 
@@ -67,8 +83,9 @@ private:
 
     void deleteTree(Node *root);
     Node* copyTree(const Node *_NIL, Node *root);
-    void dumpTree(Node *root) const;
-    
+    void dumpTreeDot(Node *root) const;
+   
+
     Node NodeNIL;
     Node *NIL;
     Node *root_;
@@ -81,7 +98,6 @@ void RBTree<KeyT>::deleteTree(Node *root)
         return;
     deleteTree(root->left);
     deleteTree(root->right);
-    
     delete root;
 }
 
@@ -112,7 +128,16 @@ RBTree<KeyT>::RBTree(const RBTree &tree)
     root_ = copyTree(tree.NIL, tree.root_);
 }
 
+template <typename KeyT>
+RBTree<KeyT> &RBTree<KeyT>::operator=(const RBTree &tree)
+{
+    if(this == &tree)
+        return *this;
 
+    deleteTree(root_);
+    root_ = copyTree(tree.NIL, tree.root_);
+    return *this;
+}
 
 template <typename KeyT>
 void RBTree<KeyT>::rotateLeft(Node *node)
@@ -465,21 +490,21 @@ void RBTree<KeyT>::remove(const KeyT &key)
 }
 
 template <typename KeyT>
-void RBTree<KeyT>::dumpTree(Node *root) const
+void RBTree<KeyT>::dumpTreeDot(Node *root) const
 {
     if(root == NIL)
         return;
     
-    root->dump();
+    root->dumpDot();
     if(root->left != NIL)
     {
         std::cout << root->key << " -> " << root->left->key << std::endl;
-        dumpTree(root->left);
+        dumpTreeDot(root->left);
     }
     if(root->right != NIL)
     {
         std::cout << root->key << " -> " << root->right->key << std::endl;
-        dumpTree(root->right);
+        dumpTreeDot(root->right);
     }
 
     if(root->left == NIL || root->right == NIL) 
@@ -491,14 +516,14 @@ void RBTree<KeyT>::dumpTree(Node *root) const
 }
 
 template <typename KeyT>
-void RBTree<KeyT>::dump() const
+void RBTree<KeyT>::dumpDot() const
 {
     std::cout << "digraph tree\n{" << std::endl; 
 
     std::cout << "nil[fillcolor=black, fontcolor=white, style=filled]" ;
     if(root_ == NIL)
         std::cout << "nil" << std::endl;
-    dumpTree(root_);
+    dumpTreeDot(root_);
     std::cout << "}" << std::endl;
 }
 
