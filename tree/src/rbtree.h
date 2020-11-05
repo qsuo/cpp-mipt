@@ -2,6 +2,7 @@
 #ifndef RBTREE_H
 #define RBTREE_H
 
+#include <vector>
 #include <iostream>
 
 namespace tree
@@ -69,6 +70,8 @@ public:
     Node* lowerBound(const KeyT &key) const;
     size_t rangeQuery(const KeyT &low, const KeyT &high) const;
 
+    std::vector<KeyT> getSorted() const;
+
     void dumpDot() const;
 
 private:
@@ -85,7 +88,7 @@ private:
     Node* copyTree(const Node *_NIL, Node *root);
     void dumpTreeDot(Node *root) const;
    
-
+    
     Node NodeNIL;
     Node *NIL;
     Node *root_;
@@ -487,6 +490,21 @@ void RBTree<KeyT>::remove(const KeyT &key)
         fixRemove(pivot);
 
     delete dnode;
+}
+
+
+template <typename KeyT>
+std::vector<KeyT> RBTree<KeyT>::getSorted() const
+{
+    std::vector<KeyT> sorted;
+
+    auto min = root_;
+    while(min->left != NIL)
+        min = min->left;
+
+    for(auto i = min; i != nullptr; i = next(i))
+        sorted.push_back(i->key);
+    return sorted;
 }
 
 template <typename KeyT>
