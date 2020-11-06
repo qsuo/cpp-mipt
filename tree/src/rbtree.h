@@ -12,8 +12,10 @@ template <typename KeyT>
 class RBTree
 {
 
-private:
+public:
     enum Color { RED, BLACK };
+
+private:
     
     struct Node
     {
@@ -71,6 +73,8 @@ public:
     size_t rangeQuery(const KeyT &low, const KeyT &high) const;
 
     std::vector<KeyT> getSorted() const;
+    
+    const Node* root() const { return root_; }
 
     void dumpDot() const;
 
