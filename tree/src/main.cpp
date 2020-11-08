@@ -6,8 +6,11 @@
 #include <fstream>
 #include <iostream>
 
+#include <sstream>
+
 int main()
 {
-    range_query(std::cin, std::cout);
+    query::range_query(std::cin, std::cout);
+    std::cout << std::endl;
     return 0;
 }

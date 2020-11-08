@@ -319,6 +319,8 @@ typename RBTree<KeyT>::Node* RBTree<KeyT>::lowerBound(const KeyT &key) const
 {
     Node *current = root_;
     Node *parent = nullptr;
+    if(root_ == NIL)
+        return nullptr;
     while(current != NIL)
     {
         if(current->key == key)

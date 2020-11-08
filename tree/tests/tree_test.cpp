@@ -119,6 +119,8 @@ TEST(RBTree, bound)
 {
     tree::RBTree<int> tree;
 
+    EXPECT_EQ(tree.lowerBound(0), nullptr);
+
     for(int i = 10; i >= 0; i--)
         tree.insert(i);
     tree.insert(12);
@@ -132,6 +134,7 @@ TEST(RBTree, bound)
 
     EXPECT_EQ(tree.lowerBound(13), nullptr);
     EXPECT_EQ(tree.lowerBound(-1)->key, 0);
+
 }
 
 
@@ -139,6 +142,8 @@ TEST(RBTree, query)
 {
     tree::RBTree<int> tree;
     
+    EXPECT_EQ((size_t) 0, tree.rangeQuery(0, 10));
+
     const int NKEYS = 10;
     for(int i = 0; i < NKEYS; ++i)
         tree.insert(i);
@@ -212,7 +217,7 @@ TEST(RBTree, structure)
     EXPECT_EQ(root->right->right->right->color, tree::RBTree<int>::RED);
 }
 
-
+/*
 TEST(RBTree, perfomance)
 {
     const int NKEYS = 10000000;
@@ -243,5 +248,6 @@ TEST(RBTree, perfomance)
 
     EXPECT_TRUE(rb_time < set_time);
 }
+*/
 
 }// namespace ut

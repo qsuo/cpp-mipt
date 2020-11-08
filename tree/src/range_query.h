@@ -4,7 +4,11 @@
 
 #include <fstream>
 
-void range_query(std::istream &in, std::ostream &out);
+namespace query
+{
 
+int range_query(std::istream &in, std::ostream &out);
+
+}// namespace query
 #endif
 
