@@ -17,7 +17,7 @@ SOURCES:= $(wildcard $(SRC_DIR)/*.cpp)
 OBJS:= $(SOURCES:.cpp=.o)
 TEST_OBJS := $(filter-out $(SRC_DIR)/main.o, $(OBJS)) $(TEST_OBJS)
 
-EXE:= test main
+EXE:= test main bench
 ALL:= $(EXE)
 
 ifeq ($(wildcard $(GTEST_INSTALL_DIR)/*), )
@@ -39,6 +39,9 @@ gtestlib:
 $(TEST_DIR)/%.o: $(TEST_DIR)/%.cpp 
 	$(CXX) $(CXXFLAGS) $(TEST_FLAGS) -o $@ -c $< $(LIB_FLAGS)
 
+$(TEST_DIR)/perf/%.o: $(TEST_DIR)/perf/%.cpp 
+	$(CXX) $(CXXFLAGS) $(TEST_FLAGS) -o $@ -c $< $(LIB_FLAGS)
+
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
@@ -47,6 +50,9 @@ test: $(TEST_OBJS)
 
 main: $(SRC_DIR)/main.o $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
+
+bench: $(TEST_DIR)/perf/main.o $(TEST_DIR)/perf/perf.o
+	$(CXX) $(CXXFLAGS) $(TEST_FLAGS) -o $@ $^ $(LIB_FLAGS)
 
 clean:
 	rm -rf $(EXE) $(OBJS) $(TEST_OBJS) $(SRC_DIR)/*.d $(TEST_DIR)/*.d main.o
