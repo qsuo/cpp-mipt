@@ -1,6 +1,6 @@
 
 CXX:= g++
-CXXFLAGS:= -Wall -MD -g
+CXXFLAGS:= -Wall -MD
 SRC_DIR:= ./src
 TEST_DIR:= ./tests
 GTEST_DIR:= ../googletest
@@ -17,7 +17,7 @@ SOURCES:= $(wildcard $(SRC_DIR)/*.cpp)
 OBJS:= $(SOURCES:.cpp=.o)
 TEST_OBJS := $(filter-out $(SRC_DIR)/main.o, $(OBJS)) $(TEST_OBJS)
 
-EXE:= test main bench
+EXE:= test main
 ALL:= $(EXE)
 
 ifeq ($(wildcard $(GTEST_INSTALL_DIR)/*), )
@@ -39,9 +39,6 @@ gtestlib:
 $(TEST_DIR)/%.o: $(TEST_DIR)/%.cpp 
 	$(CXX) $(CXXFLAGS) $(TEST_FLAGS) -o $@ -c $< $(LIB_FLAGS)
 
-$(TEST_DIR)/perf/%.o: $(TEST_DIR)/perf/%.cpp 
-	$(CXX) $(CXXFLAGS) $(TEST_FLAGS) -o $@ -c $< $(LIB_FLAGS)
-
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
@@ -51,14 +48,11 @@ test: $(TEST_OBJS)
 main: $(SRC_DIR)/main.o $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-bench:
-	g++ -O2 tests/perf/main.cpp tests/perf/perf.cpp -Isrc -pthread -lgtest -I../googletest/install/include/ -L../googletest/install/lib/ -o bench
-
 clean:
 	rm -rf $(EXE) $(OBJS) $(TEST_OBJS) $(SRC_DIR)/*.d $(TEST_DIR)/*.d main.o
 
 clean-all: clean
-	rm -rf $(GTEST_INSTALL_DIR) $(GTEST_BUILD_DIR) bench
+	rm -rf $(GTEST_INSTALL_DIR) $(GTEST_BUILD_DIR)
 	
 
 
