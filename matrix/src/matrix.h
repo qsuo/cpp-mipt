@@ -3,6 +3,7 @@
 #define MATRIX_H
 
 #include <algorithm>
+#include <functional>
 #include <iostream>
 
 namespace alg
@@ -19,7 +20,6 @@ public:
     struct Row
     {
         T *row;
-        size_t size;
 
         const T& operator[](int n) const { return row[n]; }
         T& operator[](int n)             { return row[n]; }
@@ -28,7 +28,7 @@ public:
 /************************************************************/
 
     Matrix(size_t nrows, size_t ncols, T val = T());
-    Matrix(size_t n, T val = T());
+    explicit Matrix(size_t n);
     
     template <typename It>
     Matrix(size_t nrows, size_t ncols, It begin, It end);
@@ -41,8 +41,8 @@ public:
 
     Matrix& operator=(const Matrix &rhs);
     
-    const Row operator[](int n) const  { return { buffer_[n], ncols_ }; }
-    Row operator[](int n)              { return { buffer_[n], ncols_ }; }
+    //const   Row operator[](int n) const { return { buffer_[n] }; }
+    Row operator[](int n) { return { buffer_[n] }; }
 
     Matrix& operator+= (const Matrix& rhs) &;
     Matrix& operator-= (const Matrix& rhs) &;
@@ -50,8 +50,10 @@ public:
 
 /************************************************************/
 
-    size_t nrows() { return nrows_; }
-    size_t ncols() { return ncols_; }
+    size_t nrows()  const   { return nrows_; }
+    size_t ncols()  const   { return ncols_; }
+    size_t size()   const   { return nrows_ * ncols_; }
+    T **data()      const   { return buffer_; }
 
 /************************************************************/
     
@@ -61,13 +63,16 @@ public:
 
 /************************************************************/
 
+    void swapRows(size_t i, size_t j);
+    
+    /*
     Matrix& negate() &;
     Matrix operator-() const;
     Matrix& transpose() &;
-    void swapRows(size_t i, size_t j);
     Matrix& dotProduct(const Matrix& rhs) &;
+    */
 
-    T determinant() const;
+    //T determinant() const;
 
 /************************************************************/
 
@@ -75,8 +80,8 @@ private:
    
     void allocateBuffer(size_t nrows, size_t ncols);
 
-    unsigned nrows_;
-    unsigned ncols_;
+    size_t nrows_;
+    size_t ncols_;
 
     T **buffer_ = nullptr;
     T *init_ = nullptr;
@@ -107,8 +112,8 @@ void Matrix<T>::allocateBuffer(size_t nrows, size_t ncols)
 }
 
 template <typename T>
-Matrix<T>::Matrix(size_t nrows, size_t ncols, T val): 
-    nrows_(nrows), ncols_(ncols)
+Matrix<T>::Matrix(size_t nrows, size_t ncols, T val)
+    : nrows_(nrows), ncols_(ncols)
 {
     allocateBuffer(nrows_, ncols_);
     for(size_t i = 0; i < nrows_; i++)
@@ -119,14 +124,14 @@ Matrix<T>::Matrix(size_t nrows, size_t ncols, T val):
 }
 
 template <typename T>
-Matrix<T>::Matrix(size_t n, T val): Matrix(n, n)
+Matrix<T>::Matrix(size_t n): Matrix(n, n)
 {
 }
 
 template <typename T>
 template <typename It>
-Matrix<T>::Matrix(size_t nrows, size_t ncols, It begin, It end):
-    nrows_(nrows), ncols_(ncols)
+Matrix<T>::Matrix(size_t nrows, size_t ncols, It begin, It end)
+    : nrows_(nrows), ncols_(ncols)
 {
     allocateBuffer(nrows_, ncols_);
     auto it = begin;
@@ -143,8 +148,8 @@ Matrix<T>::Matrix(size_t nrows, size_t ncols, It begin, It end):
 }
 
 template <typename T>
-Matrix<T>::Matrix(const Matrix &rhs):
-    nrows_(rhs.nrows_), ncols_(rhs.ncols_)
+Matrix<T>::Matrix(const Matrix &rhs)
+    : nrows_(rhs.nrows_), ncols_(rhs.ncols_)
 {
     allocateBuffer(nrows_, ncols_);
     for(size_t i = 0; i < nrows_; i++)
@@ -251,7 +256,7 @@ bool Matrix<T>::equal(const Matrix &rhs) const
     for(size_t i = 0; i < nrows_; i++)
     {
         for(size_t j = 0; j < ncols_; j++)
-            if(buffer_[i][j] != rhs.buffer_[i][j])
+            if(!(buffer_[i][j] == rhs.buffer_[i][j]))
                 return false;
     }
     return true;
@@ -273,7 +278,6 @@ T Matrix<T>::trace() const
     return tmp;
 }
 
-
 template <typename T>
 void Matrix<T>::dump() const
 {
@@ -284,6 +288,84 @@ void Matrix<T>::dump() const
         std::cout << std::endl;
     }
 }
+
+template < typename T, class Compare = std::equal_to<T> >
+T determinant(const Matrix<T> &matrix)
+{
+    Compare comparator;
+    Matrix<T> triangle(matrix);
+
+    
+    for(size_t i = 0; i < triangle.nrows(); i++)
+    {
+        size_t row = i;
+        bool swap = false;
+        for(row = i; row < triangle.nrows(); row++)
+        {
+            if(!comparator(triangle[i][row], T(0)) && i != row)
+            {
+                swap = true;
+                break;
+            }
+        }
+
+        if(swap)
+            triangle.swapRows(i, row);
+
+        for(size_t j = i + 1; j < triangle.nrows(); j++)
+        {
+            auto m1 = triangle[j][i];
+            auto m2 = triangle[i][i];
+            for(size_t k = i; k < triangle.ncols(); k++)
+                triangle[j][k] -= triangle[i][k] / m2 * m1;
+        }
+    }
+
+    T det(1);
+    for(size_t i = 0; i < triangle.nrows(); i++)
+        det *= triangle[i][i];
+    return det;
+
+}
+
+
+#if 0
+template <typename T>
+T Matrix<T>::determinant() const
+{
+    Matrix triangle(*this);
+    int count = 1;
+    for(size_t i = 0; i < triangle.nrows_; i++)
+    {
+        if(triangle[i][i] < 1e-6)
+        {
+            size_t r = 0;
+            bool f = false;
+            for(r = i + 1; r < triangle.nrows_; r++)
+                if(triangle[r][i] > 1e-6)
+                {
+                    triangle.swapRows(r, i);
+                    f = true;
+                    count = -count;
+                }
+            if(!f)
+                return 0;
+        }
+
+        for(size_t j = i + 1; j < nrows_; j++)
+        {
+            auto m = triangle[j][i] / triangle[i][i];
+            for(size_t k = i; k < ncols_; k++)
+                triangle[j][k] -= triangle[i][k] * m;
+        }
+    }
+
+    T det = 1;
+    for(size_t i = 0; i < nrows_; i++)
+        det *= triangle[i][i];
+    return det * count;
+}
+#endif
 
 }// namespace alg
 #endif
