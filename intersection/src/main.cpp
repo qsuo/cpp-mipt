@@ -1,5 +1,4 @@
 
-#include "triangle.h"
 #include "intersection.h"
 
 #include <vector>
@@ -12,7 +11,7 @@ using Vector = space::Vector<3>;
 
 Vector inputPoint()
 {
-    std::array<double, 3> coord;
+    std::vector<double> coord(3);
     for(size_t i = 0; i < coord.size(); ++i)
         std::cin >> coord[i];
     return Vector(coord);
@@ -74,7 +73,6 @@ int main()
     deleteTriangles(triangles);
     return 0;
 }
-
 
 
 

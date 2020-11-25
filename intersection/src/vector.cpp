@@ -28,6 +28,4 @@ double pseudoProduct(const Vector<2> &lhs, const Vector<2> &rhs)
     return lhs[0] * rhs[1] - lhs[1] * rhs[0];
 }
 
-
-
 }// namespace space

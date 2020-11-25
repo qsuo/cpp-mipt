@@ -1,6 +1,8 @@
 #include "segment.h"
 #include "vector.h"
 #include "triangle.h"
+#include "intersection.h"
+
 
 #include <cmath>
 #include <vector>
@@ -9,55 +11,55 @@
 namespace
 {
 
-bool collinear(const space::Segment<2> &s1, const space::Segment<2> &s2)
+bool collinear(const space::Segment<2> &lhs, const space::Segment<2> &rhs)
 {
-    auto prod = std::abs(space::pseudoProduct(s1.vector, s2.vector));
-    auto expr = prod / (s1.vector.length() * s2.vector.length());
+    auto prod = std::abs(space::pseudoProduct(lhs.vector(), rhs.vector()));
+    auto expr = prod;
     return space::equal(expr, 0); 
 }
 
-bool onSameLine(const space::Segment<2> &s1, const space::Segment<2> &s2)
+bool onSameLine(const space::Segment<2> &lhs, const space::Segment<2> &rhs)
 {
-    auto r = s2.a - s1.b;
-    auto prod = std::abs(space::pseudoProduct(s2.vector, r));
-    auto expr = prod / (s2.vector.length() * r.length());
+    auto r = rhs.a() - lhs.b();
+    auto prod = std::abs(space::pseudoProduct(rhs.vector(), r));
+    auto expr = prod;
     return space::equal(expr, 0);
 }
 
-bool overlap(const space::Segment<2> &s1, const space::Segment<2> &s2)
+bool overlap(const space::Segment<2> &lhs, const space::Segment<2> &rhs)
 {
-    bool result = (space::dotProduct(s1.a - s2.b, s1.a - s2.b) > 0) &&
-                  (space::dotProduct(s1.b - s2.b, s1.b - s2.b) > 0) &&
-                  (space::dotProduct(s2.a - s1.a, s2.a - s1.b) > 0) &&
-                  (space::dotProduct(s2.b - s1.a, s2.b - s1.b) > 0);
+    bool result = (space::dotProduct(lhs.a() - rhs.b(), lhs.a() - rhs.b()) > 0) &&
+                  (space::dotProduct(lhs.b() - rhs.b(), lhs.b() - rhs.b()) > 0) &&
+                  (space::dotProduct(rhs.a() - lhs.a(), rhs.a() - lhs.b()) > 0) &&
+                  (space::dotProduct(rhs.b() - lhs.a(), rhs.b() - lhs.b()) > 0);
     return !result;
 }
+
 }// namespace 
 
 
 namespace space
 {
 
-bool intersection(const Segment<2> &first, const Segment<2> &second)
+bool intersection(const Segment<2> &lhs, const Segment<2> &rhs)
 {
-    
-    bool coll = collinear(first, second);
-    bool sameLine = onSameLine(first, second);
+    bool coll = ::collinear(lhs, rhs);
+    bool sameLine = onSameLine(lhs, rhs);
     if(coll && !sameLine)
         return false;
     if(coll && sameLine)
-        return overlap(first, second);
+        return overlap(lhs, rhs);
 
-    auto &r1 = first.vector;
-    auto &r2 = second.vector;
+    auto r1 = lhs.vector();
+    auto r2 = rhs.vector();
 
-    auto prod1 = pseudoProduct(second.b, second.a);
-    auto prod2 = pseudoProduct(first.b, first.a);
+    auto prod1 = pseudoProduct(rhs.b(), rhs.a());
+    auto prod2 = pseudoProduct(lhs.b(), lhs.a());
     auto gprod = pseudoProduct(r2, r1);
     auto r = (r1 * (prod1 / gprod) - r2 * (prod2 / gprod));
 
-    auto t1 = dotProduct(r - first.a, r - first.b); 
-    auto t2 = dotProduct(r - second.a, r - second.b); 
+    auto t1 = dotProduct(r - lhs.a(), r - lhs.b()); 
+    auto t2 = dotProduct(r - rhs.a(), r - rhs.b()); 
 
     bool res1 = (t1 < 0) || equal(t1, 0); 
     bool res2 = (t2 < 0) || equal(t2, 0);
@@ -67,25 +69,30 @@ bool intersection(const Segment<2> &first, const Segment<2> &second)
 
 }// namespace space
 
+
 namespace
 {
-bool sameSide(space::Vector<2> p1, space::Vector<2> p2, space::Segment<2> segment)
+
+bool sameSide(space::Point<2> a, space::Point<2> b, space::Segment<2> segment)
 {
-    auto prod1 = space::crossProduct(segment.b - segment.a, p1 - segment.a);
-    auto prod2 = space::crossProduct(segment.b - segment.a, p2 - segment.a);
+    auto prod1 = space::crossProduct(segment.b() - segment.a(), a - segment.a());
+    auto prod2 = space::crossProduct(segment.b() - segment.a(), b - segment.a());
     auto sprod = space::dotProduct(prod1, prod2);
     if(sprod > 0 || space::equal(sprod, 0))
         return true;
     return false;
 }
 
-
-bool pointInsideTriangle(const space::Vector<2> &point, const space::Triangle<2> &triangle)
+bool pointInsideTriangle(const space::Point<2> &point, const space::Triangle<2> &triangle)
 {
-    auto tpoints = triangle.getPoints();
-    bool in = (sameSide(point, tpoints[0], {tpoints[1], tpoints[2]})) &&
-              (sameSide(point, tpoints[1], {tpoints[2], tpoints[0]})) &&
-              (sameSide(point, tpoints[2], {tpoints[0], tpoints[1]}));
+    auto points = triangle.points();
+
+    if(triangle.isPoint)
+        return point == points[0];
+
+    bool in = (sameSide(point, points[0], {points[1], points[2]})) &&
+              (sameSide(point, points[1], {points[2], points[0]})) &&
+              (sameSide(point, points[2], {points[0], points[1]}));
     return in;
 }
 
@@ -108,13 +115,19 @@ bool edgesIntersection(const space::Triangle<2>::Edges &fedges, const space::Tri
 namespace space
 {
 
+bool pointInsideTriangle(const space::Point<2> &point, const space::Triangle<2> &triangle)
+{
+    return ::pointInsideTriangle(point, triangle);
+}
+
 bool intersection(const Triangle<2> &first, const Triangle<2> &second)
 {
-    auto fpoints = first.getPoints();
-    auto spoints = second.getPoints();
-    if(edgesIntersection(first.getEdges(), second.getEdges()))
+    auto fpoints = first.points();
+    auto spoints = second.points();
+   
+    if(edgesIntersection(first.edges(), second.edges()))
         return true;
-
+    
     if(pointInsideTriangle(fpoints[0], second) || pointInsideTriangle(spoints[0], first))
         return true;
     
@@ -148,7 +161,7 @@ struct Interval
 SelectedPoints computeDistances(const space::Triangle<3> &triangle, const space::Triangle<3>::Points& points)
 {
     SelectedPoints spoints;
-    auto plane = getPlane(triangle);
+    auto plane = triangle.plane();
     for(const auto& point : points)
     {
         auto dist = plane.distance(point);
@@ -227,7 +240,6 @@ Interval intersectionInterval(SelectedPoints &points, const space::Vector<3> lin
     std::vector<DistPoint> minor;
    
     classifyPoints(major, minor, points);
-    
     assert(major.size() == 2);
     assert(minor.size() == 1);
 
@@ -275,7 +287,7 @@ size_t mostAreaAxis(const space::Triangle<3> &first, const space::Triangle<3> &s
     double maxArea = 0;
     for(size_t i = 0; i < 3; ++i)
     {
-        auto area = project(first, i).area();
+        auto area = project(first, i).area() + project(second, i).area();
         if(area > maxArea)
         {
             area = maxArea;
@@ -289,7 +301,6 @@ size_t mostAreaAxis(const space::Triangle<3> &first, const space::Triangle<3> &s
 bool coplanarIntersection(const space::Triangle<3> &first, const space::Triangle<3> &second)
 {
     auto axis = mostAreaAxis(first, second);
-
     auto pfirst = project(first, axis);
     auto psecond = project(second, axis);
     
@@ -303,11 +314,64 @@ bool coplanarIntersection(const space::Triangle<3> &first, const space::Triangle
 
 namespace space
 {
+
+PlaneIntersectionPoint intersection(const Plane &plane, const Line<3> &line)
+{
+    auto dprod = dotProduct(line.direction(), plane.normal());
+    auto iprod = -dotProduct(line.initial(), plane.normal()) - plane.m();
+   
+    bool parallel = false;
+    if(equal(dprod, 0))
+        parallel = true;
+    else
+        parallel = false;
+
+    if(parallel && equal(iprod, 0))
+        return { {0, 0, 0}, true, true };
+    if(parallel && !equal(iprod, 0))
+        return { {0, 0, 0}, true, false };
+    
+    auto d = iprod / dprod;
+    auto point = Point<3>(line.initial() + line.direction() * d);
+    
+    return { point, false, true };
+
+}
+
+PlaneIntersectionPoint intersection(const Plane &plane, const Segment<3> &segment)
+{
+    Line<3> line(segment);
+    
+    auto intpoint = intersection(plane, line);
+    if(intpoint.intersect && !intpoint.coplanar)
+        return { intpoint.point, intpoint.coplanar, segment.belong(intpoint.point) };
+    return intpoint;
+}
+
+bool TriangleSegmentIntersection(const Triangle<3> &first, const Triangle<3> &second)
+{
+    auto intpoint = intersection(first.plane(), second.segment); 
+    if(!intpoint.intersect)
+        return false;
+    if(intpoint.coplanar)
+        return coplanarIntersection(first, second);
+
+    auto axis = mostAreaAxis(first, second);
+    auto pfirst = project(first, axis);
+    auto point = intpoint.point.project(axis);
+    return pointInsideTriangle(point, pfirst);
+
+}
+
 bool intersection(const Triangle<3> &first, const Triangle<3> &second)
 {
-    
-    auto fpoints = computeDistances(first, second.getPoints());
-    auto spoints = computeDistances(second, first.getPoints());
+    if(second.isSegment)
+        return TriangleSegmentIntersection(first, second);    
+    if(first.isSegment)
+        return TriangleSegmentIntersection(second, first);    
+
+    auto fpoints = computeDistances(first, second.points());
+    auto spoints = computeDistances(second, first.points());
     if(fromOneSide(fpoints) || fromOneSide(spoints))
         return false;
 
@@ -317,9 +381,9 @@ bool intersection(const Triangle<3> &first, const Triangle<3> &second)
         return coplanarIntersection(first, second);
     }
 
-    auto fplane = getPlane(first);
-    auto splane = getPlane(second);
-    auto intersectLine = crossProduct(fplane.getNormal(), splane.getNormal());
+    auto fplane = first.plane();
+    auto splane = second.plane();
+    auto intersectLine = crossProduct(fplane.normal(), splane.normal());
     
     auto finterval =  intersectionInterval(fpoints, intersectLine);   
     auto sinterval =  intersectionInterval(spoints, intersectLine);   
@@ -328,3 +392,4 @@ bool intersection(const Triangle<3> &first, const Triangle<3> &second)
 }
 
 }// namespace space
+

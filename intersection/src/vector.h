@@ -4,8 +4,11 @@
 
 #include "common.h"
 
+#include <vector>
 #include <array>
 #include <iostream>
+#include <initializer_list>
+
 
 namespace space
 {
@@ -15,49 +18,53 @@ class Vector
 {
 public:
 
-    using Coordinates = std::array<double, Dim>;
+    using Coordinates = std::vector<double>;
     
     
     Vector(const Coordinates &coords);
     Vector(const Vector &vec);
+    Vector(std::initializer_list<double> ilist);  
 
     bool operator==(const Vector &vec) const;
     Vector &operator+=(const Vector &vec);
     Vector &operator-=(const Vector &vec);
     Vector &operator*=(double val);
 
-    double& operator[](size_t index) { return coords_[index]; }
-    const double& operator[](size_t index) const { return coords_[index]; }
+    double& operator[](size_t index)                { return coords_[index]; }
+    const double& operator[](size_t index) const    { return coords_[index]; }
+
 
     double length() const;
     Vector<Dim - 1> project(size_t axis) const;
     
+    size_t size() const { return size; }
+
     void dump() const;
 private:
     
     Coordinates coords_;
-
+    size_t size_;
 };
 
 
 template <size_t Dim>
-Vector<Dim>::Vector(const Vector &vec): coords_(vec.coords_) 
+Vector<Dim>::Vector(const Vector &vec): coords_(vec.coords_), size_(Dim)
 {}
 
 template <size_t Dim>
-Vector<Dim>::Vector(const Coordinates &coords): coords_(coords)
-{}
-
-template <size_t Dim>
-bool Vector<Dim>::operator==(const Vector &vec) const
+Vector<Dim>::Vector(const Coordinates &coords): coords_(coords), size_(Dim)
 {
-    for(size_t i = 0; i < Dim; ++i)
-    {
-        if(!equal(coords_[i], vec.coords_[i]))
-            return false;
-    }
+}
 
-    return true;
+template <size_t Dim>
+Vector<Dim>::Vector(std::initializer_list<double> ilist): coords_(ilist), size_(Dim)
+{}
+
+
+template <size_t Dim>
+bool Vector<Dim>::operator==(const Vector &rhs) const
+{
+    return (coords_ == rhs.coords_);
 }
 
 template <size_t Dim>
@@ -71,7 +78,7 @@ Vector<Dim> &Vector<Dim>::operator+=(const Vector &vec)
 template <size_t Dim>
 Vector<Dim> &Vector<Dim>::operator-=(const Vector &vec)
 {
-    for(size_t i = 0; i < Dim; ++i)
+    for(size_t i = 0; i < Dim; i++)
         coords_[i] -= vec.coords_[i];
     return *this;
 }
@@ -139,7 +146,7 @@ double dotProduct(const Vector<Dim> &lhs, const Vector<Dim> &rhs)
 template <size_t Dim>
 Vector<Dim - 1> Vector<Dim>::project(size_t axis) const
 {
-    std::array<double, Dim - 1> vector = {};
+    std::vector<double> vector(Dim - 1);
     for(size_t i = 0, j = 0; i < Dim; i++)
     {
         if(i == axis)
@@ -154,6 +161,8 @@ Vector<3> crossProduct(const Vector<3> &lhs, const Vector<3> &rhs);
 Vector<3> crossProduct(const Vector<2> &lhs, const Vector<2> &rhs);
 
 double pseudoProduct(const Vector<2> &lhs, const Vector<2> &rhs);
+
+bool collinear(const Vector<2> &lhs, const Vector<2> &rhs);
 
 }// namespace space
 
