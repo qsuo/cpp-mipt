@@ -1,15 +1,16 @@
 
-#include "intersection.h"
+#include "triangles_set_intersection.h"
 
 #include <vector>
 #include <iostream>
 #include <array>
 #include <set>
 
-using Triangle = space::Triangle<3>;
-using Vector = space::Vector<3>;
+using Triangle  = space::Triangle<3>;
+using Vector    = space::Vector<3>;
+using Point     = space::Point<3>;
 
-Vector inputPoint()
+Point inputPoint()
 {
     std::vector<double> coord(3);
     for(size_t i = 0; i < coord.size(); ++i)
@@ -17,7 +18,7 @@ Vector inputPoint()
     return Vector(coord);
 }
 
-Triangle* createTriangle(Vector a, Vector b, Vector c)
+Triangle* createTriangle(Vector &a, Vector &b, Vector &c)
 {
     return new Triangle(a, b, c);
 }
@@ -41,31 +42,14 @@ void deleteTriangles(std::vector<Triangle*> &triangles)
         delete triangle;
 }
 
-std::set<size_t> findIntersections(std::vector<Triangle*> triangles)
-{
-    std::set<size_t> idx;
-    auto size = triangles.size();
-    for(size_t i = 0; i < size - 1; ++i)
-    {
-        for(size_t j = i + 1; j < size; ++j)
-        {
-            if(intersection(*triangles[i], *triangles[j]))
-            {
-                idx.insert(i);
-                idx.insert(j);
-            }
-        }
-    }
-    return idx;
-}
-
 int main()
 {
     size_t n = 0;
     std::cin >> n;
     auto triangles = inputTriangles(n);
-
-    auto intersect = findIntersections(triangles);
+    
+    auto intersect = space::findIntersections(triangles);
+    
     for(auto i : intersect)
         std::cout << i << " ";
     std::cout << std::endl;
@@ -73,6 +57,5 @@ int main()
     deleteTriangles(triangles);
     return 0;
 }
-
 
 

@@ -34,7 +34,8 @@ public:
     }
     bool isPoint = false;
     bool isSegment = false;
-    Segment<Dim> segment;
+    Segment<Dim> segment; 
+
 protected:
 
     Points points_;
@@ -52,7 +53,7 @@ TriangleBase<Dim>::TriangleBase( const Point<Dim> &a,
 {
     if(a == b && b == c)
         isPoint = true;
-    if( (a == b) && !(b == c) )// || ((b == c) && !(b == a)) )
+    if( (a == b) && !(b == c) )
     {
         isSegment = true;
         segment = Segment<Dim>(a, c);
@@ -62,7 +63,7 @@ TriangleBase<Dim>::TriangleBase( const Point<Dim> &a,
         isSegment = true;
         segment = Segment<Dim>(b, c);
     }
-
+    
 }
 
 template <size_t Dim>
@@ -79,9 +80,45 @@ class Triangle<3> : public TriangleBase<3>
 { 
 
 public:
+    
+    struct BoundBox
+    {
+        Point<3> min = {};
+        Point<3> max = {};
+    } box;
+
+
+    
     Triangle(const Point<3> &a, const Point<3> &b, const Point<3> &c):
         TriangleBase(a, b, c)
-    {}
+    {
+        auto minx = points_[0][0];
+        auto miny = points_[0][1];
+        auto minz = points_[0][2];
+
+        auto maxx = points_[0][0];
+        auto maxy = points_[0][1];
+        auto maxz = points_[0][2];
+
+        for(size_t i = 1; i < 3; i++)
+        {
+            if(points_[i][0] < minx)
+                minx = points_[i][0];
+            if(points_[i][1] < miny)
+                miny = points_[i][1];
+            if(points_[i][2] < minz)
+                minz = points_[i][2];
+
+            if(points_[i][0] > maxx)
+                maxx = points_[i][0];
+            if(points_[i][1] > maxy)
+                maxy = points_[i][1];
+            if(points_[i][2] > maxz)
+                maxz = points_[i][2];
+        }
+
+        box = { {minx, miny, minz}, {maxx, maxy, maxz} };
+    }
 
     Plane plane() const
     {
