@@ -45,6 +45,44 @@ struct ComparatorPtr
 namespace space
 {
 
+Point<3> inputPoint(std::istream &in)
+{
+    std::vector<double> coord(3);
+    for(size_t i = 0; i < coord.size(); ++i)
+        in >> coord[i];
+    return Point<3>(coord);
+}
+
+Triangle<3>* createTriangle(Point<3> &a, Point<3> &b, Point<3> &c)
+{
+    return new Triangle<3>(a, b, c);
+}
+
+std::vector<Triangle<3>*> inputTriangles(std::istream &in)
+{
+    size_t n = 0;
+    in >> n;
+    std::vector<Triangle<3>*> triangles(n);
+    for(size_t i = 0; i < n; i++)
+    {
+        auto a = inputPoint(in);
+        auto b = inputPoint(in);
+        auto c = inputPoint(in);
+        triangles[i] = createTriangle(a, b, c);
+    }
+    return triangles;
+}
+
+void deleteTriangles(std::vector<Triangle<3>*> &triangles)
+{
+    for(auto triangle : triangles)
+        delete triangle;
+}
+
+}// namespace
+namespace space
+{
+
 std::set<size_t> findIntersections_naive(std::vector<Triangle<3>*> triangles)
 {
     std::set<size_t> idx;
@@ -87,5 +125,19 @@ std::set<size_t> findIntersections(std::vector<Triangle<3>*> triangles)
     }
     return idx;
 }
+
+
+void triangleIntersections(std::istream &in, std::ostream &out)
+{
+    auto triangles = inputTriangles(in);
+    
+    auto intersect = findIntersections(triangles);
+    
+    for(auto i : intersect)
+        out << i << " ";
+    deleteTriangles(triangles);
+
+}
+
 
 }// namespace space
