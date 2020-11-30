@@ -328,44 +328,5 @@ T determinant(const Matrix<T> &matrix)
 
 }
 
-
-#if 0
-template <typename T>
-T Matrix<T>::determinant() const
-{
-    Matrix triangle(*this);
-    int count = 1;
-    for(size_t i = 0; i < triangle.nrows_; i++)
-    {
-        if(triangle[i][i] < 1e-6)
-        {
-            size_t r = 0;
-            bool f = false;
-            for(r = i + 1; r < triangle.nrows_; r++)
-                if(triangle[r][i] > 1e-6)
-                {
-                    triangle.swapRows(r, i);
-                    f = true;
-                    count = -count;
-                }
-            if(!f)
-                return 0;
-        }
-
-        for(size_t j = i + 1; j < nrows_; j++)
-        {
-            auto m = triangle[j][i] / triangle[i][i];
-            for(size_t k = i; k < ncols_; k++)
-                triangle[j][k] -= triangle[i][k] * m;
-        }
-    }
-
-    T det = 1;
-    for(size_t i = 0; i < nrows_; i++)
-        det *= triangle[i][i];
-    return det * count;
-}
-#endif
-
 }// namespace alg
 #endif

@@ -156,12 +156,6 @@ TEST(Matrix, determinant)
     EXPECT_DOUBLE_EQ(determinant(ident), 1);
 
     }
-    std::vector<double> v2 = {0, 2, 3, 9, 5, 6, 7, 8, 9};
-    alg::Matrix<double> m1(3, 3, v2.begin(), v2.end());
     
-    EXPECT_DOUBLE_EQ(determinant(m1), 33);
-    m1.swapRows(0, 2);
-    auto d = alg::determinant<double, d_equal_to>(m1);
-    EXPECT_DOUBLE_EQ(d, 33);
 }
 
